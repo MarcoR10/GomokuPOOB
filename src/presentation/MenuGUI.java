@@ -89,6 +89,15 @@ public class MenuGUI extends JFrame{
         BJugar = new JButton("Play");
         BJugar.setBackground(Color.WHITE);
         BJugar.setBounds((Pantalla.width / 5)+18,(Pantalla.height / 5)+100,100,20);
+        BJugar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Hacer invisible el fondo al presionar "Play"
+                Front.setVisible(false);
+                // Llamar al método para alistar los elementos de configuración
+                prepareElementsPlayer();
+            }
+        });
         //--------------------------------------------//
         Inicio.add(BJugar);
         Inicio.add(Front);
