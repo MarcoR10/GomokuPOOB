@@ -151,7 +151,7 @@ public class Gomoku {
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------//
     public static void main(String[] args) {
-        Gomoku game = new Gomoku('T', 'T',false,false);
+        Gomoku game = new Gomoku('M', 'T',false,true);
         game.start();
     }
     // Métodos para obtener las coordenadas del jugador desde la consola (Ejemplo básico)
@@ -166,7 +166,6 @@ public class Gomoku {
         return scanner.nextInt();
     }
     //-------------------------------------------------------------------------------------------------------------------------------------------------//
-
 }
 
 

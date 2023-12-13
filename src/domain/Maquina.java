@@ -1,12 +1,8 @@
 package domain;
 
-public class Maquina implements Jugador{
-    private char Ficha;
-    private String Nombre;
-    private int Puntaje;
-    // private Tiempo time;
+public class Maquina extends Jugadores{
     public Maquina(char ficha){
-        Ficha = ficha;
+        super(ficha);
     }
     public char getFicha(){
         return Ficha;

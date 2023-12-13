@@ -1,21 +1,7 @@
 package domain;
 
-public class Humano implements Jugador{
-
-    private String Nombre;
-    private char Ficha;
-    private int Puntaje;
-   // private Tiempo time;
-
+public class Humano extends Jugadores {
     public Humano(char ficha){
-        Ficha = ficha;
+        super(ficha);
     }
-
-    public char getFicha(){
-        return Ficha;
-    }
-    public void Play(){
-
-    }
-
 }

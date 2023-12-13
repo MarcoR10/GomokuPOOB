@@ -18,55 +18,29 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MenuGUI extends JFrame{
     private static MenuGUI GomukuPOOB;
-    private JPanel Inicio,Configuracion,Juego;
+    private Gomoku Game;
+    private int Posx,Posy;
+    private char Tjugador1,Tjugador2;
+    private JPanel Inicio,Configuracion,Juego,Player1,Player2;
     private JLabel Front;
-    private JButton BJugar,colorJugador1,colorJugador2;
+    private JButton BJugar,colorJugador1,colorJugador2,confirm;
     private JButton[][] buttons;
     private Dimension Pantalla;
     private JMenu archivo, settings;
     private JMenuBar menuBar;
     private JMenuItem load, save, start, quit, tamaño, colorselect,restart;
-
     private String[] opciones,opciones2,opciones3,opciones4,opciones5;
-    //private BoardGUI boardGUI;
-    //private Configuracion2 gameConfig;
-    //private Configuracion configuracion;
-    private Color colorFondo;
-    private JFileChooser fileChooser;
     private ImageIcon Fondo;
     private Color color;
-    private String name;
-    //private Dimension Pantalla;
-    private int nJugadores, cont;
-    private HashMap<String, Color> jugadores;
     private JTextField nombreJugador1,nombreJugador2;
     private JLabel Nombre1,Nombre2, Color1,Color2,CasillasE, PiedrasE,TipoJugador1,TipoJugador2,Modo;
-    private JPanel Entrada, botones;
-    private JButton confirm, reset, returnToMenu, exit, colorPlayer;
-
     private JComboBox<String> comboBox1,comboBox2,comboBox3,comboBox4,comboBox5;
-
-    //private JMenu archivo, settings;
-    //private JMenuBar menuBar;
-    //private JMenuItem load,save,start,quit,tamaño,colorselect,restart;
-    private JFileChooser Seleccion;
-    //private Color color ;
-    private JTextField inputField;
-
 
     //-------------------------------------------------------------------------//
     public MenuGUI() {
         prepareElements();
         prepareActions();
     }
-    //-------------------------------------------------------------------------//
-    public static MenuGUI getGUI() {
-        if (GomukuPOOB == null) {
-            GomukuPOOB = new MenuGUI();
-        }
-        return GomukuPOOB;
-    }
-
     //-------------------------------------------------------------------------//
     public void prepareElements() {
         setTitle("Go-moku POOB");
@@ -89,15 +63,6 @@ public class MenuGUI extends JFrame{
         BJugar = new JButton("Play");
         BJugar.setBackground(Color.WHITE);
         BJugar.setBounds((Pantalla.width / 5)+18,(Pantalla.height / 5)+100,100,20);
-        BJugar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Hacer invisible el fondo al presionar "Play"
-                Front.setVisible(false);
-                // Llamar al método para alistar los elementos de configuración
-                prepareElementsPlayer();
-            }
-        });
         //--------------------------------------------//
         Inicio.add(BJugar);
         Inicio.add(Front);
@@ -111,23 +76,6 @@ public class MenuGUI extends JFrame{
         //setSize(Pantalla.width, Pantalla.height);
         setLocationRelativeTo(null);
         Configuracion.setLayout(null);
-
-        // Cargar la imagen
-        //ImageIcon fondo = new ImageIcon(getClass().getResource("/Imagenes/Fondo.jpg"));
-        //JLabel fondoLabel = new JLabel(fondo);
-        //fondoLabel.setBounds(0, 0, fondo.getIconWidth(), fondo.getIconHeight());
-
-        // Establecer la imagen como fondo usando un LayeredPane
-       // JLayeredPane layeredPane = new JLayeredPane();
-       //layeredPane.setPreferredSize(new Dimension(fondo.getIconWidth(), fondo.getIconHeight()));
-       //layeredPane.add(fondoLabel, new Integer(Integer.MIN_VALUE));
-
-        Fondo = new ImageIcon(getClass().getResource("/Imagenes/Fondo.jpg"));
-        Image Fon = Fondo.getImage().getScaledInstance(Pantalla.width,Pantalla.height ,Image.SCALE_DEFAULT);
-        ImageIcon Fone = new ImageIcon(Fon);
-        Front = new JLabel(Fone);
-        Front.setBounds(0, 0, Fone.getIconWidth(), Fone.getIconHeight());
-        Configuracion.add(Front);
         //--------------------------------------------//
         Nombre1 = new JLabel("Introduce tu nombre Jugador 1 :");
         Nombre1.setFont(new Font("Bodoni MT Cursiva", Font.BOLD, 15));
@@ -238,6 +186,20 @@ public class MenuGUI extends JFrame{
     }
 
     private void PanelJuego() {
+        Object j1 = comboBox1.getSelectedItem();
+        String Typo1 = (String) j1;
+        Tjugador1 = Typo1.charAt(1);
+        Object j2 = comboBox2.getSelectedItem();
+        String Typo2 = (String) j2;
+        Tjugador2 = Typo2.charAt(1);
+        Object casilla = comboBox4.getSelectedItem();
+        Object ficha = comboBox5.getSelectedItem();
+        boolean casillaValor = Boolean.parseBoolean((String) casilla);
+        boolean fichaValor = Boolean.parseBoolean((String) ficha);
+        //--------------------------------------------//
+        Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor);
+        //System.out.println(letra1.charAt(1)+ letra2.charAt(1) + ficha.toString()+casilla.toString());
+        //Game.start();
         //--------------------------------------------//
         Juego = new JPanel(new GridBagLayout());
         Juego.setLayout(new GridLayout(15, 15));
@@ -259,13 +221,15 @@ public class MenuGUI extends JFrame{
                 gbc.ipadx = 150 / 15;
                 gbc.ipady = 350 / 15;
                 Juego.add(buttons[row][col], gbc);
-
             }
         }
-        //panel.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
-        getContentPane().add(Juego, BorderLayout.CENTER);
+        //Juego.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
         //-------------------------------------------------------------------------//
+        Player1 = new JPanel();
+        Player1.setLayout(null);
         //-------------------------------------------------------------------------//
+        Player2 = new JPanel();
+        Player2.setLayout(null);
         //-------------------------------------------------------------------------//
         //-------------------------------------------------------------------------//
         //-------------------------------------------------------------------------//
@@ -274,6 +238,9 @@ public class MenuGUI extends JFrame{
         //-------------------------------------------------------------------------//
         //-------------------------------------------------------------------------//
         //--------------------------------------------//
+        getContentPane().add(Juego, BorderLayout.CENTER);
+        add(Player1, BorderLayout.WEST);
+        add(Player2, BorderLayout.EAST);
         add(Juego);
     }
     //-------------------------------------------------------------------------//
@@ -315,7 +282,6 @@ public class MenuGUI extends JFrame{
         PanelConfiguracion();
         prepareActionsConfiguration();
         Configuracion.setVisible(true);
-        //add(configuracion = new Configuracion(2));
         validate();
         repaint();
     }
@@ -326,33 +292,10 @@ public class MenuGUI extends JFrame{
         prepareElementsMenu();
         prepareActionsJuego();
         Juego.setVisible(true);
-        //add(configuracion = new Configuracion(2));
         validate();
         repaint();
     }
 
-    public void prepareElementsGameConfig(HashMap<String, Color> jugadores){
-        //this.remove(configuracion);
-        //add(gameConfig = new Configuracion2(jugadores));
-        validate();
-        repaint();
-    }
-    public void prepareElementsBoard(int nSerpientes, int nEscaleras, boolean hasEspeciales, int porcCasilla, int porcModif, HashMap<String, Color> jugadores) {
-        //this.remove(gameConfig);
-        //boardGUI = new BoardGUI(nSerpientes, nEscaleras, hasEspeciales, porcCasilla, porcModif, jugadores);
-        //add(boardGUI);
-        validate();
-        repaint();
-    }
-
-    public void restartGame(){
-        //this.remove(boardGUI);
-        validate();
-        repaint();
-    }
-    public void finishGame() {
-        System.exit(0);
-    }
     private void salida() {
         if (JOptionPane.showConfirmDialog(rootPane, "Seguro que quiere salir", "Salir del sistema", JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION) {
@@ -447,20 +390,44 @@ public class MenuGUI extends JFrame{
         });
         for (int row = 0; row < 15; row++) {
             for (int col = 0; col < 15; col++) {
+                int finalRow = row;
+                int finalCol = col;
                 buttons[row][col].addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-
+                        int cont = 0;
+                        JButton selectedButton = (JButton) e.getSource();
+                        for (int row = 0; row < buttons.length; row++) {
+                            for (int col = 0; col < buttons[row].length; col++) {
+                                if (buttons[row][col] == selectedButton) {
+                                    Posx = row;
+                                    Posy = col;
+                                    Jugada(Posx, Posy);
+                                    System.out.println("Botón seleccionado en la posición: (" + row + ", " + col + ")");
+                                    return;
+                                }
+                            }
+                        }
                     }
                 });
             }
         }
     }
+
+    public void Jugada(int fila,int columna){
+        Game.playgame(fila,columna);
+        // Cambiar el color del botón en la fila y columna seleccionada
+        //Color nuevoColor = (Game.obtenerJugadorActual() == 'M') ? Color.RED : Color.BLUE;
+        //buttons[fila][columna].setBackground(nuevoColor);
+        // También puedes deshabilitar el botón después de que se haya realizado la jugada
+       // buttons[fila][columna].setEnabled(false);
+    }
+
     private void Nuevo() {
         int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea iniciar una nueva simulación?", "Nueva simulación", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
-            //colony = new Colony();
-            //photo.repaint();
+            Game = new Gomoku('M', 'T',false,true);
+            repaint();
         }
     }
     /**

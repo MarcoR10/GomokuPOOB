@@ -1,15 +1,13 @@
 package domain;
 import java.awt.*;
 
-public class Normal implements Ficha{
+public class Normal extends Fichas{
     private final char Tipo = 'N';
     private Color color;
     private char jugador;
-    public void setJugador(char jugador) {
-        this.jugador  = jugador;
-    }
-    public char TypeFicha() {
-        return Tipo;
+
+    public Normal(){
+
     }
 
 }

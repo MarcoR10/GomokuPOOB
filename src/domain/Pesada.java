@@ -2,16 +2,13 @@ package domain;
 
 import java.awt.*;
 
-public class Pesada implements Ficha {
+public class Pesada extends Fichas{
     private final char Tipo = 'P';
     private Color color;
     private char jugador;
 
-    public void setJugador(char jugador) {
-        this.jugador  = jugador;
-    }
-    public char TypeFicha() {
-        return Tipo;
+    public Pesada(){
+
     }
 
     public void colocarEnTablero(Tablero tablero, int x, int y, char jugador) {
