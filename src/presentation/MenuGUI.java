@@ -443,19 +443,12 @@ public class MenuGUI extends JFrame{
     public void Jugada(int fila,int columna){
         Game.playgame(fila, columna);
         char currentPlayer = Game.FichaPlayer();
-        boolean jugadaValida = Game.Verificacion(fila, columna, currentPlayer);
+        Color colorFicha = (currentPlayer == 'X') ? Color.RED : Color.BLUE;
+        buttons[fila][columna].setBackground(colorFicha);
+        buttons[fila][columna].setEnabled(false);
         boolean JuegoFinaliado = Game.getJuegoFinalizado();
-        if (!JuegoFinaliado) {
-            Color colorFicha = (currentPlayer == 'X') ? Color.RED : Color.BLUE;
-            buttons[fila][columna].setBackground(colorFicha);
-            buttons[fila][columna].setEnabled(false);
-            // Verificar si hay un ganador después de la jugada
-            boolean hayGanador = Game.getJuegoFinalizado();
-            if (hayGanador) {
-                JOptionPane.showMessageDialog(null, "¡El jugador " + currentPlayer + " ha ganado!");
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Jugada inválida. Intenta en otra casilla.");
+        if (JuegoFinaliado) {
+            JOptionPane.showMessageDialog(null, "¡El jugador " + currentPlayer + " ha ganado!");
         }
     }
 

@@ -6,7 +6,6 @@ public class Golden extends Casillas{
         super(x, y);
         type = 'G';
     }
-
     public void darPiedraAleatoria(Jugador jugador) {
         Random random = new Random();
         int tipoPiedra = random.nextInt(3); // Suponiendo que hay 3 tipos de piedra
