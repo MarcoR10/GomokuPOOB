@@ -1,5 +1,4 @@
 package presentation;
-
 import domain.*;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -20,6 +19,8 @@ public class MenuGUI extends JFrame{
     private static MenuGUI GomukuPOOB;
     private Gomoku Game;
     private int Posx,Posy;
+    boolean casillaValor,fichaValor;
+    private String NombreJ1 ,NombreJ2,ColorJ1,ColorJ2;
     private char Tjugador1,Tjugador2;
     private JPanel Inicio,Configuracion,Juego,Player1,Player2;
     private JLabel Front;
@@ -194,8 +195,8 @@ public class MenuGUI extends JFrame{
         Tjugador2 = Typo2.charAt(1);
         Object casilla = comboBox4.getSelectedItem();
         Object ficha = comboBox5.getSelectedItem();
-        boolean casillaValor = Boolean.parseBoolean((String) casilla);
-        boolean fichaValor = Boolean.parseBoolean((String) ficha);
+        casillaValor = Boolean.parseBoolean((String) casilla);
+        fichaValor = Boolean.parseBoolean((String) ficha);
         //--------------------------------------------//
         Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor);
         //System.out.println(letra1.charAt(1)+ letra2.charAt(1) + ficha.toString()+casilla.toString());
@@ -223,18 +224,42 @@ public class MenuGUI extends JFrame{
                 Juego.add(buttons[row][col], gbc);
             }
         }
-        //Juego.setBorder(BorderFactory.createEmptyBorder(100, 100, 100, 100));
         //-------------------------------------------------------------------------//
         Player1 = new JPanel();
-        Player1.setLayout(null);
+        Player1.setLayout(new FlowLayout());
+        //JugadorInfo jugador1Info = obtenerInformacionJugador(Tjugador1);
+        //JugadorInfo jugador2Info = obtenerInformacionJugador(Tjugador2);
+        // Crear etiquetas para mostrar la información del jugador 1
+        JLabel nombreJugador1 = new JLabel("Nombre: " + NombreJ1);
+        JLabel colorJugador1 = new JLabel("Color: " + ColorJ1);
+        //JLabel fichaJugador1 = new JLabel("Ficha: " + jugador1Info.getFicha());
+        //JLabel puntajeJugador1 = new JLabel("Puntaje: " + jugador1Info.getPuntaje());
+        // Establecer ubicaciones y tamaños de las etiquetas del jugador 1
+        nombreJugador1.setBounds(10, 20, 150, 30);
+        colorJugador1.setBounds(10, 60, 150, 30);
+        //fichaJugador1.setBounds(10, 100, 150, 30);
+        //puntajeJugador1.setBounds(10, 140, 150, 30);
+        // Agregar etiquetas del jugador 1 al panel Player1
+        Player1.add(nombreJugador1);
+        Player1.add(colorJugador1);
+        // Player1.add(fichaJugador1);
+        // Player1.add(puntajeJugador1);
         //-------------------------------------------------------------------------//
         Player2 = new JPanel();
-        Player2.setLayout(null);
-        //-------------------------------------------------------------------------//
-        //-------------------------------------------------------------------------//
-        //-------------------------------------------------------------------------//
-        //-------------------------------------------------------------------------//
-        //-------------------------------------------------------------------------//
+        Player2.setLayout(new FlowLayout());
+        // Crear etiquetas para mostrar la información del jugador 2 (siguiendo un proceso similar al del jugador 1)
+        JLabel nombreJugador2 = new JLabel("Nombre: " + NombreJ2);
+        JLabel colorJugador2 = new JLabel("Color: " + ColorJ2 );
+        // JLabel fichaJugador2 = new JLabel("Ficha: " + jugador2Info.getFicha());
+        //JLabel puntajeJugador2 = new JLabel("Puntaje: " + jugador2Info.getPuntaje());
+        nombreJugador2.setBounds(10, 20, 150, 30);
+        colorJugador2.setBounds(10, 60, 150, 30);
+        //fichaJugador2.setBounds(10, 100, 150, 30);
+        //puntajeJugador2.setBounds(10, 140, 150, 30);
+        Player2.add(nombreJugador2);
+        Player2.add(colorJugador2);
+        //Player2.add(fichaJugador2);
+        //Player2.add(puntajeJugador2);
         //-------------------------------------------------------------------------//
         //-------------------------------------------------------------------------//
         //--------------------------------------------//
@@ -357,13 +382,14 @@ public class MenuGUI extends JFrame{
             }
         });
         confirm.addActionListener(e -> {
+            NombreJ1= nombreJugador1.getText();
+            NombreJ2= nombreJugador2.getText();
             prepareElementsBoard();
         });
     }
 
     public void prepareActionsJuego() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
         quit.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -415,18 +441,28 @@ public class MenuGUI extends JFrame{
     }
 
     public void Jugada(int fila,int columna){
-        Game.playgame(fila,columna);
-        // Cambiar el color del botón en la fila y columna seleccionada
-        //Color nuevoColor = (Game.obtenerJugadorActual() == 'M') ? Color.RED : Color.BLUE;
-        //buttons[fila][columna].setBackground(nuevoColor);
-        // También puedes deshabilitar el botón después de que se haya realizado la jugada
-       // buttons[fila][columna].setEnabled(false);
+        Game.playgame(fila, columna);
+        char currentPlayer = Game.FichaPlayer();
+        boolean jugadaValida = Game.Verificacion(fila, columna, currentPlayer);
+        boolean JuegoFinaliado = Game.getJuegoFinalizado();
+        if (!JuegoFinaliado) {
+            Color colorFicha = (currentPlayer == 'X') ? Color.RED : Color.BLUE;
+            buttons[fila][columna].setBackground(colorFicha);
+            buttons[fila][columna].setEnabled(false);
+            // Verificar si hay un ganador después de la jugada
+            boolean hayGanador = Game.getJuegoFinalizado();
+            if (hayGanador) {
+                JOptionPane.showMessageDialog(null, "¡El jugador " + currentPlayer + " ha ganado!");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Jugada inválida. Intenta en otra casilla.");
+        }
     }
 
     private void Nuevo() {
         int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea iniciar una nueva simulación?", "Nueva simulación", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
-            Game = new Gomoku('M', 'T',false,true);
+            Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor);
             repaint();
         }
     }
