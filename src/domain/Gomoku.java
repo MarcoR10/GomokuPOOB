@@ -10,9 +10,9 @@ import java.util.Scanner;
 public class Gomoku implements Serializable {
     private Tablero tablero;
     private Jugador j1, j2;
-    private int NumCasill;
+    private int NumCasill,NumP;
     private boolean JuegoFinalizado, turnoJugador;
-
+    private char LimitaGame;
     /**
      * Constructor de la clase Gomoku.
      * @param Tjugardor1 Tipo de jugador 1 ('M' para máquina, cualquier otro carácter para humano)
@@ -20,7 +20,10 @@ public class Gomoku implements Serializable {
      * @param FichaE Indica si se usan fichas especiales
      * @param CasillaE Indica si se usan casillas especiales
      */
-    public Gomoku(char Tjugardor1, char Tjugardor2, boolean FichaE, boolean CasillaE,int NumCasill) {
+    public Gomoku(char Tjugardor1, char Tjugardor2, boolean FichaE, boolean CasillaE,int NumCasill,char LimitaGame) {
+        this.NumCasill = NumCasill;
+        NumP = NumCasill / 2;
+        this.LimitaGame = LimitaGame;
         tablero = new Tablero(NumCasill, NumCasill, FichaE, CasillaE);
         j1 = crearJugador(Tjugardor1, 'X');
         j2 = crearJugador(Tjugardor2, 'O');
@@ -69,39 +72,27 @@ public class Gomoku implements Serializable {
      * @param y Coordenada Y seleccionada por el jugador
      */
     public void playGame(int x, int y) {
-        Jugador jugadorActual = turnoJugador ? j1:j2  ;
-        Casillas casillaActual = tablero.getCasilla(x, y);
-        char fichaActual = casillaActual.getFicha();
-        Ficha fichaJugador = jugadorActual.getFicha();
-        char fichajugadoractual = fichaJugador.getJugador();
-        // Verificar si la ficha a colocar es de tipo especial y realizar acciones específicas
-        // Verificar si la casilla es especial
-        if (casillaActual instanceof Mine) {
-            ((Mine) casillaActual).explotar(jugadorActual, tablero.getCasillas());
-        } else if (casillaActual instanceof Teleport) {
-            ((Teleport) casillaActual).teletransportar(jugadorActual, fichajugadoractual, tablero);
-        } else if (casillaActual instanceof Golden) {
-            ((Golden) casillaActual).darPiedraAleatoria(jugadorActual);
-        }if (fichaJugador instanceof Pesada) {
-            ((Pesada) fichaJugador).colocarEnTablero(tablero, x, y, fichajugadoractual);
-        } else if (fichaJugador instanceof Temporal) {
-            ((Temporal) fichaJugador).colocarEnTablero(tablero, x, y, fichajugadoractual);
-        } else {
-            // Si no es una casilla especial, colocar la ficha normalmente
-            if (fichaActual != ' ') {
-                System.out.println("La casilla ya está ocupada. Elija otra posición.");
-                return;
-            }
-            tablero.colocarFicha(x, y, fichajugadoractual);
-            tablero.imprimirTablero();
-            if (Verificacion(x, y, fichajugadoractual)) {
-                JuegoFinalizado = true;
-                turnoJugador = !turnoJugador;
-                System.out.println("¡" + (turnoJugador ? "Jugador 1" : "Jugador 2") + " ha ganado!");
-                return;
-            }
+        switch (LimitaGame) {
+            case 'Q':
+                // Lógica para el tipo de juego Quicktime
+                break;
+            case 'P':
+                jugarConPiedrasLimitadas(tablero, turnoJugador, x, y);
+                break;
+            default:
+                Jugador jugadorActual = turnoJugador ? j1 : j2;
+                Casillas casillaActual = tablero.getCasilla(x, y);
+                char fichaActual = casillaActual.getFicha();
+                Ficha fichaJugador = jugadorActual.getFicha();
+                if (manejarCasillaEspecial(casillaActual, jugadorActual, tablero)) {
+                    return;
+                }
+                if (manejarFichaEspecial(fichaJugador, tablero, x, y)) {
+                    return;
+                }
+                colocarFichaNormal(tablero, x, y, fichaJugador, jugadorActual, fichaActual);
+                break;
         }
-        turnoJugador = !turnoJugador;
     }
 
     public void JugarMaquina(int x, int y){
@@ -168,6 +159,95 @@ public class Gomoku implements Serializable {
         return count >= 5;
     }
 
+    //-------------------------------------------------------------------------------------------------------------------------------------------------//
+    private boolean manejarCasillaEspecial(Casillas casilla, Jugador jugador, Tablero tablero) {
+        if (casilla instanceof Mine) {
+            ((Mine) casilla).explotar(jugador, tablero.getCasillas());
+            return true;
+        } else if (casilla instanceof Teleport) {
+            ((Teleport) casilla).teletransportar(jugador, jugador.getFicha().getJugador(), tablero);
+            return true;
+        } else if (casilla instanceof Golden) {
+            ((Golden) casilla).darPiedraAleatoria(jugador);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean manejarFichaEspecial(Ficha ficha, Tablero tablero, int x, int y) {
+        char jugadorActual = ficha.getJugador();
+        if (ficha instanceof Pesada) {
+            ((Pesada) ficha).colocarEnTablero(tablero, x, y, jugadorActual);
+            return true;
+        } else if (ficha instanceof Temporal) {
+            ((Temporal) ficha).colocarEnTablero(tablero, x, y, jugadorActual);
+            return true;
+        }
+        return false;
+    }
+
+    private void colocarFichaNormal(Tablero tablero, int x, int y, Ficha fichaJugador, Jugador jugadorActual, char fichaActual) {
+        if (fichaActual != ' ') {
+            System.out.println("La casilla ya está ocupada. Elija otra posición.");
+            return;
+        }
+        tablero.colocarFicha(x, y, fichaJugador.getJugador());
+        tablero.imprimirTablero();
+        if (Verificacion(x, y, fichaJugador.getJugador())) {
+            JuegoFinalizado = true;
+            turnoJugador = !turnoJugador;
+            System.out.println("¡" + (turnoJugador ? "Jugador 1" : "Jugador 2") + " ha ganado!");
+        } else {
+            turnoJugador = !turnoJugador;
+        }
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------//
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------//
+    private void jugarConPiedrasLimitadas(Tablero tablero, boolean turnoJugador, int x, int y) {
+        char jugadorActual = turnoJugador ? 'X' : 'O';
+        int piedrasColocadasJugador1 = contarPiedrasColocadas(tablero, 'X');
+        int piedrasColocadasJugador2 = contarPiedrasColocadas(tablero, 'O');
+        if ((jugadorActual == 'X' && piedrasColocadasJugador1 >= NumP) ||
+                (jugadorActual == 'O' && piedrasColocadasJugador2 >= NumP)) {
+            System.out.println("Has alcanzado el límite de piedras. No puedes colocar más.");
+            return;
+        }
+        colocarFicha(tablero, x, y, jugadorActual);
+    }
+
+    private int contarPiedrasColocadas(Tablero tablero, char jugador) {
+        int piedrasColocadas = 0;
+        for (int fila = 0; fila < tablero.getLongitud(); fila++) {
+            for (int columna = 0; columna < tablero.getAltura(); columna++) {
+                char fichaActual = tablero.getCasilla(fila, columna).getFicha();
+                if (fichaActual == jugador) {
+                    piedrasColocadas++;
+                }
+            }
+        }
+        return piedrasColocadas;
+    }
+
+    private void colocarFicha(Tablero tablero, int x, int y, char jugadorActual) {
+        if (tablero.getCasilla(x, y).getFicha() == ' ') {
+            tablero.colocarFicha(x, y, jugadorActual);
+            tablero.imprimirTablero();
+            System.out.println("Se ha colocado una ficha en la posición (" + x + ", " + y + ")");
+            if (Verificacion(x, y, jugadorActual)) {
+                System.out.println("¡" + (jugadorActual == 'X' ? "Jugador 1" : "Jugador 2") + " ha ganado!");
+                JuegoFinalizado = true;
+                return;
+            }
+        } else {
+            System.out.println("La casilla está ocupada. Elija otra posición.");
+            return;
+        }
+        turnoJugador = !turnoJugador;
+    }
+//-------------------------------------------------------------------------------------------------------------------------------------------------//
+
     public char FichaPlayer(){
         Jugador jugadorActual = turnoJugador ? j1 : j2;
         Ficha fichaJugador = jugadorActual.getFicha();
@@ -183,6 +263,7 @@ public class Gomoku implements Serializable {
         return JuegoFinalizado;
     }
 
+    //-------------------------------------------------------------------------------------------------------------------------------------------------//
     /**
      * Método para cargar un archivo del juego.
      * @param archivo Archivo a cargar
@@ -215,7 +296,7 @@ public class Gomoku implements Serializable {
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------//
     public static void main(String[] args) {
-        Gomoku game = new Gomoku('M', 'T',false,false,15);
+        Gomoku game = new Gomoku('T', 'T',false,false,15,'N');
         game.start();
     }
     // Métodos para obtener las coordenadas del jugador desde la consola (Ejemplo básico)

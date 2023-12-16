@@ -19,7 +19,7 @@ public class MenuGUI extends JFrame{
     private int Posx,Posy,Table;
     private boolean casillaValor,fichaValor;
     private String NombreJ1 ,NombreJ2;
-    private char Tjugador1,Tjugador2;
+    private char Tjugador1,Tjugador2,TmodoJ;
     private JPanel Inicio,Configuracion,Juego,Player1,Player2;
     private JButton BJugar,colorJugador1,colorJugador2,confirm;
     private JTextField nombreJugador1,nombreJugador2;
@@ -189,6 +189,10 @@ public class MenuGUI extends JFrame{
         casillaValor = Boolean.parseBoolean((String) casilla);
         fichaValor = Boolean.parseBoolean((String) ficha);
         //--------------------------------------------//
+        Object modo = comboBox3.getSelectedItem();
+        String ModoG = (String) modo;
+        TmodoJ = ModoG.charAt(0);
+        //--------------------------------------------//
         Object Tamaño = comboBox6.getSelectedItem();
         String TamañoT = (String) Tamaño;
         switch(TamañoT){
@@ -206,7 +210,7 @@ public class MenuGUI extends JFrame{
                 break;
         }
         //--------------------------------------------//
-        Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor,Table);
+        Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor,Table,TmodoJ);
         //--------------------------------------------//
         Juego = new JPanel(new GridBagLayout());
         Juego.setLayout(new GridLayout(Table, Table));
@@ -498,12 +502,12 @@ public class MenuGUI extends JFrame{
         }
     }
     private void reiniciarJuego() {
-        Game = new Gomoku(Tjugador1, Tjugador2, fichaValor, casillaValor,Table);
+        Game = new Gomoku(Tjugador1, Tjugador2, fichaValor, casillaValor,Table,TmodoJ);
         limpiarTablero();
     }
     private void limpiarTablero() {
-        for (int row = 0; row < 15; row++) {
-            for (int col = 0; col < 15; col++) {
+        for (int row = 0; row < Table; row++) {
+            for (int col = 0; col < Table; col++) {
                 buttons[row][col].setColorCirculo(null);
                 buttons[row][col].setEnabled(true);
             }
