@@ -1,6 +1,8 @@
 package domain;
 
-public class Casillas {
+import java.io.Serializable;
+
+public class Casillas implements Serializable {
     protected int x,y;
     protected char ficha,type;
     public Casillas(int x, int y) {

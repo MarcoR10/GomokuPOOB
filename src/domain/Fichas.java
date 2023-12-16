@@ -1,8 +1,9 @@
 package domain;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Fichas implements Ficha{
+public class Fichas implements Ficha, Serializable {
     protected char Tipo;
     protected Color color;
     protected char jugador;

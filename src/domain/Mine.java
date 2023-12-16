@@ -1,6 +1,8 @@
 package domain;
 
-public class Mine extends Casillas{
+import java.io.Serializable;
+
+public class Mine extends Casillas implements Serializable {
     private boolean explotado = false;
     public Mine(int x, int y) {
         super(x, y);

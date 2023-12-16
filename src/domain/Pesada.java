@@ -1,8 +1,9 @@
 package domain;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Pesada extends Fichas{
+public class Pesada extends Fichas implements Serializable {
     private char Tipo = 'P';
     private Color color;
     private char jugador;
@@ -13,14 +14,21 @@ public class Pesada extends Fichas{
     }
 
     public void colocarEnTablero(Tablero tablero, int x, int y, char jugador) {
-        // Colocar la ficha pesada en el tablero ocupando dos casillas consecutivas
-        // Puedes implementar la lógica para verificar y colocar la ficha pesada según las direcciones permitidas en el tablero
-        // Por ejemplo, para dirección este (derecha):
+        // Verificar si es posible colocar la ficha pesada en la dirección este/derecha
         if (x + 1 < tablero.getLongitud()) {
-            tablero.colocarFicha(x, y, jugador);
-            tablero.colocarFicha(x + 1, y, jugador);
+            Casillas casilla1 = tablero.getCasilla(x, y);
+            Casillas casilla2 = tablero.getCasilla(x + 1, y);
+            // Verificar que las dos casillas estén vacías para poder colocar la ficha pesada
+            if (casilla1.getFicha() == ' ' && casilla2.getFicha() == ' ') {
+                // Colocar la ficha pesada ocupando dos casillas consecutivas
+                tablero.colocarFicha(x, y, jugador);
+                tablero.colocarFicha(x + 1, y, jugador);
+            } else {
+                System.out.println("No es posible colocar la ficha pesada en esta dirección.");
+            }
+        } else {
+            System.out.println("No es posible colocar la ficha pesada en esta dirección, se excede el límite del tablero.");
         }
-        // Puedes implementar lógica similar para las direcciones norte y noreste
     }
 
 }

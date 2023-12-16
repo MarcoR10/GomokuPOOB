@@ -1,11 +1,12 @@
 package domain;
+import java.io.Serializable;
 import java.util.Random;
 
 /**
  * La clase Tablero representa el tablero de juego para un juego específico.
  * Contiene métodos para inicializar, modificar y visualizar el tablero.
  */
-public class Tablero {
+public class Tablero implements Serializable {
     private Casillas[][] casillas;
     private int Longitud,Altura;
     private boolean Fespecial,Cespecial;

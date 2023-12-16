@@ -1,8 +1,10 @@
 package domain;
 
-public class Maquina extends Jugadores{
-    public Maquina(Fichas ficha){
-        super(ficha);
+import java.io.Serializable;
+
+public class Maquina extends Jugadores implements Serializable {
+    public Maquina(Fichas ficha,char Tipo){
+        super(ficha,Tipo);
     }
     public Fichas getFicha(){
         return Ficha;
@@ -11,28 +13,22 @@ public class Maquina extends Jugadores{
     public void Play(Tablero tablero, Gomoku gomoku) {
         int x = generarMovimientoAleatorio(tablero.getLongitud());
         int y = generarMovimientoAleatorio(tablero.getAltura());
-
         // Verificar si la casilla generada aleatoriamente está vacía y realizar el movimiento si lo está
         while (tablero.getCasilla(x, y).getFicha() != ' ') {
             x = generarMovimientoAleatorio(tablero.getLongitud());
             y = generarMovimientoAleatorio(tablero.getAltura());
         }
-        // Verificar si la casilla generada es una casilla especial y realizar la acción correspondiente
-        Casillas casillaElegida = tablero.getCasilla(x, y);
-        if (casillaElegida instanceof Mine) {
-            // Realizar la acción de explotar la mina
-            ((Mine) casillaElegida).explotar(this,tablero.getCasillas());
-        } else if (casillaElegida instanceof Teleport) {
-            // Realizar la acción de teletransportar
-            ((Teleport) casillaElegida).teletransportar(this,Ficha.getJugador(),tablero);
-        } else if (casillaElegida instanceof Golden) {
-            // Realizar la acción de obtener una piedra aleatoria
-            ((Golden) casillaElegida).darPiedraAleatoria(this);
+        gomoku.playGame(x, y);
+    }
+
+    public void Play(Tablero tablero, Gomoku gomoku, int fila, int columna) {
+        if (tablero.getCasilla(fila, columna).getFicha() == ' ') {
+            gomoku.playGame(fila, columna);
         } else {
-            // Realizar el movimiento normal si no es una casilla especial
-            gomoku.playGame(x, y);
+            System.out.println("La casilla en la fila " + fila + " y columna " + columna + " no está vacía.");
         }
     }
+
     // Generar un movimiento aleatorio dentro de los límites del tablero
     private int generarMovimientoAleatorio(int limite) {
         return (int) (Math.random() * limite);

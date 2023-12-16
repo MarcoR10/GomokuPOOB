@@ -9,13 +9,14 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MenuGUI extends JFrame{
     private static MenuGUI GomukuPOOB;
     private Gomoku Game;
-    private int Posx,Posy;
+    private int Posx,Posy,Table;
     private boolean casillaValor,fichaValor;
     private String NombreJ1 ,NombreJ2;
     private char Tjugador1,Tjugador2;
@@ -179,36 +180,53 @@ public class MenuGUI extends JFrame{
     private void PanelJuego() {
         Object j1 = comboBox1.getSelectedItem();
         String Typo1 = (String) j1;
-        Tjugador1 = Typo1.charAt(1);
+        Tjugador1 = Typo1.charAt(0);
         Object j2 = comboBox2.getSelectedItem();
         String Typo2 = (String) j2;
-        Tjugador2 = Typo2.charAt(1);
+        Tjugador2 = Typo2.charAt(0);
         Object casilla = comboBox4.getSelectedItem();
         Object ficha = comboBox5.getSelectedItem();
         casillaValor = Boolean.parseBoolean((String) casilla);
         fichaValor = Boolean.parseBoolean((String) ficha);
         //--------------------------------------------//
-        Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor);
+        Object Tamaño = comboBox6.getSelectedItem();
+        String TamañoT = (String) Tamaño;
+        switch(TamañoT){
+            case "Minimo":
+                Table  = 10;
+                break;
+            case "Estandar":
+                Table  = 15;
+                break;
+            case "Grande":
+                Table  = 20;
+                break;
+            default:
+                Table  = 15;
+                break;
+        }
+        //--------------------------------------------//
+        Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor,Table);
         //--------------------------------------------//
         Juego = new JPanel(new GridBagLayout());
-        Juego.setLayout(new GridLayout(15, 15));
+        Juego.setLayout(new GridLayout(Table, Table));
         Juego.setBorder(new CompoundBorder(new EmptyBorder(2, 2, 2, 2), new TitledBorder("Board ")));
         Juego.setBorder(new LineBorder(new Color(115,17,17), 3));
         setLocationRelativeTo(null);
         //--------------------------------------------//
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        buttons = new CirculoEnBoton[15][15];
-        for (int row = 0; row < 15; row++) {
-            for (int col = 0; col < 15; col++) {
+        buttons = new CirculoEnBoton[Table][Table];
+        for (int row = 0; row < Table; row++) {
+            for (int col = 0; col < Table; col++) {
                 buttons[row][col] = new CirculoEnBoton(); ;
                 buttons[row][col].setBackground(color);
                 gbc.gridx = col;
                 gbc.gridy = row;
-                gbc.weightx = 1.0 / 15;
-                gbc.weighty = 1.0 / 15;
-                gbc.ipadx = 150 / 15;
-                gbc.ipady = 350 / 15;
+                gbc.weightx = 1.0 / Table;
+                gbc.weighty = 1.0 / Table;
+                gbc.ipadx = 150 / Table;
+                gbc.ipady = 350 / Table;
                 Juego.add(buttons[row][col], gbc);
             }
         }
@@ -409,23 +427,34 @@ public class MenuGUI extends JFrame{
         save.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                Salvar();
+                try {
+                    Salvar();
+                } catch (GomokuException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         load.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                Abrir();
+                try {
+                    Abrir();
+                } catch (GomokuException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
-        for (int row = 0; row < 15; row++) {
-            for (int col = 0; col < 15; col++) {
+        for (int row = 0; row < Table; row++) {
+            for (int col = 0; col < Table; col++) {
                 int finalRow = row;
                 int finalCol = col;
                 buttons[row][col].addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        int cont = 0;
                         JButton selectedButton = (JButton) e.getSource();
                         for (int row = 0; row < buttons.length; row++) {
                             for (int col = 0; col < buttons[row].length; col++) {
@@ -450,13 +479,16 @@ public class MenuGUI extends JFrame{
         char currentPlayer = Game.FichaPlayer();
         Color colorFicha = (currentPlayer == 'X') ? ColorP1 : ColorP2;
         buttons[fila][columna].setColorCirculo(colorFicha);
-        //buttons[fila][columna].setBackground(colorFicha);
         buttons[fila][columna].setEnabled(false);
         boolean JuegoFinaliado = Game.getJuegoFinalizado();
         String nombreFicha = (currentPlayer == 'X') ? NombreJ1 : NombreJ2;
         if (JuegoFinaliado) {
             JOptionPane.showMessageDialog(null, "¡El jugador " + nombreFicha + " ha ganado!");
         }
+    }
+
+    private void realizarJugadaMaquina(int x, int y) {
+        Game.JugarMaquina(x,y);
     }
 
     private void Nuevo() {
@@ -466,59 +498,75 @@ public class MenuGUI extends JFrame{
         }
     }
     private void reiniciarJuego() {
-        Game = new Gomoku(Tjugador1, Tjugador2, fichaValor, casillaValor);
+        Game = new Gomoku(Tjugador1, Tjugador2, fichaValor, casillaValor,Table);
         limpiarTablero();
     }
     private void limpiarTablero() {
         for (int row = 0; row < 15; row++) {
             for (int col = 0; col < 15; col++) {
-                buttons[row][col].setBackground(color);
+                buttons[row][col].setColorCirculo(null);
                 buttons[row][col].setEnabled(true);
             }
         }
         repaint();
     }
-    /**
-     * Método para abrir una simulación guardada desde un archivo.
-     */
-    private void Abrir() {
-        try {
-            JFileChooser Seleccion = new JFileChooser();
-            Seleccion.setFileFilter(new FileNameExtensionFilter("Archivo DAT", "DAT"));
-            int opcion = Seleccion.showOpenDialog(this);
-            if (opcion == JFileChooser.APPROVE_OPTION) {
-                File archivoSeleccionado = Seleccion.getSelectedFile();
-                if (archivoSeleccionado != null && archivoSeleccionado.exists()) {
-                    //colony.cargarArchivo(archivoSeleccionado);
-                    //photo.repaint();
-                    JOptionPane.showMessageDialog(null, "Archivo seleccionado: " + archivoSeleccionado.getAbsolutePath());
-                } else {
-                    JOptionPane.showMessageDialog(null, "No se ha seleccionado un archivo válido.");
-                }
-            } else {
-                throw new GomokuException("No se ha seleccionado ningún archivo.");
-            }
-        } catch (GomokuException e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
-            e.printStackTrace();
+
+    private File obtenerArchivo(String descripcion, String... extensiones) {
+        JFileChooser selector = new JFileChooser();
+        selector.setFileFilter(new FileNameExtensionFilter(descripcion, extensiones));
+        int opcion = selector.showDialog(this, null);
+        if (opcion == JFileChooser.APPROVE_OPTION) {
+            return selector.getSelectedFile();
         }
+        return null;
     }
 
-    private void Salvar() {
-        JFileChooser Seleccion = new JFileChooser();
-        Seleccion.setFileFilter(new FileNameExtensionFilter("Archivo DAT", "DAT"));
-        int opcion = Seleccion.showSaveDialog(this);
-        if (opcion == JFileChooser.APPROVE_OPTION) {
-            File archivoSeleccionado = Seleccion.getSelectedFile();
-            if (archivoSeleccionado != null) {
-                String filePath = archivoSeleccionado.getAbsolutePath();
-                if (!filePath.toLowerCase().endsWith(".DAT")) {
-                    archivoSeleccionado = new File(filePath + ".DAT");
-                }
-                //colony.guardarArchivo(archivoSeleccionado);
+    private void Abrir() throws GomokuException, IOException, ClassNotFoundException {
+        try {
+            File archivoSeleccionado = obtenerArchivo("Archivo Gomoku", "GO-M");
+            if (archivoSeleccionado != null && archivoSeleccionado.exists()) {
+                Game.cargarArchivo(archivoSeleccionado);
+                actualizarInterfazDespuesDeCarga();
+                JOptionPane.showMessageDialog(null, "Archivo seleccionado: " + archivoSeleccionado.getAbsolutePath());
             } else {
                 JOptionPane.showMessageDialog(null, "No se ha seleccionado un archivo válido.");
             }
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GomokuException("Error al abrir el archivo: " + e.getMessage());
+        }
+    }
+
+    private void actualizarInterfazDespuesDeCarga() {
+        // Aquí puedes realizar operaciones para actualizar visualmente la interfaz
+        // Esto puede incluir cambios en componentes, actualización de datos, repintado, etc.
+        // Por ejemplo, si tienes un panel que muestra información:
+        if (Juego != null) {
+            getContentPane().remove(Juego); // Elimina el panel de juego actual
+            PanelJuego(); // Crea un nuevo panel de juego
+            prepareActionsJuego(); // Prepara las acciones para el nuevo panel de juego
+            getContentPane().add(Juego, BorderLayout.CENTER); // Agrega el nuevo panel de juego al contenedor principal
+        }
+        //panelInformacion.actualizarDatos();
+        this.repaint(); // Para repintar la ventana principal
+        this.revalidate(); // Para volver a validar la disposición de los componentes
+    }
+
+    private void Salvar() throws GomokuException {
+        try {
+            File archivoSeleccionado = obtenerArchivo("Archivo Gomoku", "GO-M");
+            if (archivoSeleccionado != null) {
+                String filePath = archivoSeleccionado.getAbsolutePath();
+                if (!filePath.toLowerCase().endsWith(".go-m")) {
+                    archivoSeleccionado = new File(filePath + ".GO-M");
+                }
+                Game.guardarArchivo(archivoSeleccionado);
+            } else {
+                JOptionPane.showMessageDialog(null, "No se ha seleccionado un archivo válido.");
+            }
+        } catch (Exception e) {
+            throw new GomokuException("Error al guardar el archivo: " + e.getMessage());
         }
     }
 
@@ -553,12 +601,12 @@ class CirculoEnBoton extends JButton {
 
     public CirculoEnBoton() {
         super();
-        this.colorCirculo = null; // Color predeterminado para el círculo
+        this.colorCirculo = null;
     }
 
     public void setColorCirculo(Color color) {
         this.colorCirculo = color;
-        repaint(); // Vuelve a pintar el botón cuando se cambia el color del círculo
+        repaint();
     }
 
     @Override

@@ -1,7 +1,9 @@
 package domain;
 
-public class Humano extends Jugadores {
-    public Humano(Fichas ficha){
-        super(ficha);
+import java.io.Serializable;
+
+public class Humano extends Jugadores implements Serializable {
+    public Humano(Fichas ficha,char Tipo){
+        super(ficha,Tipo);
     }
 }

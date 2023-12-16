@@ -1,7 +1,8 @@
 package domain;
+import java.io.Serializable;
 import java.util.Random;
 
-public class Teleport extends Casillas{
+public class Teleport extends Casillas implements Serializable {
     private boolean Utilizado = false;
     public Teleport(int x, int y) {
         super(x,y);

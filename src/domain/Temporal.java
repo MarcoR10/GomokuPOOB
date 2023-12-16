@@ -1,8 +1,9 @@
 package domain;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Temporal extends Fichas{
+public class Temporal extends Fichas implements Serializable {
     private char Tipo ;
     private Color color;
     private char jugador;
@@ -13,7 +14,7 @@ public class Temporal extends Fichas{
     }
     public void colocarEnTablero(Tablero tablero, int x, int y, char jugador) {
         tablero.colocarFicha(x, y, jugador);
-        this.turnosRestantes = 3; // Configurar el contador de turnos restantes
+        this.turnosRestantes = 3; // Configurar el contador de turnos restantes al colocar la ficha
     }
     public void reducirTurno() {
         this.turnosRestantes--;

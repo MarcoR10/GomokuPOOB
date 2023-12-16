@@ -7,9 +7,10 @@ import java.util.Scanner;
  * Clase Gomoku que representa el juego Gomoku (también conocido como "Cinco en línea").
  * Esta clase gestiona la lógica del juego, los jugadores, el tablero y las acciones del juego.
  */
-public class Gomoku {
+public class Gomoku implements Serializable {
     private Tablero tablero;
     private Jugador j1, j2;
+    private int NumCasill;
     private boolean JuegoFinalizado, turnoJugador;
 
     /**
@@ -19,17 +20,17 @@ public class Gomoku {
      * @param FichaE Indica si se usan fichas especiales
      * @param CasillaE Indica si se usan casillas especiales
      */
-    public Gomoku(char Tjugardor1, char Tjugardor2, boolean FichaE, boolean CasillaE) {
-        tablero = new Tablero(15, 15, FichaE, CasillaE);
+    public Gomoku(char Tjugardor1, char Tjugardor2, boolean FichaE, boolean CasillaE,int NumCasill) {
+        tablero = new Tablero(NumCasill, NumCasill, FichaE, CasillaE);
         j1 = crearJugador(Tjugardor1, 'X');
         j2 = crearJugador(Tjugardor2, 'O');
     }
 
     private Jugador crearJugador(char tipoJugador, char ficha) {
         if (tipoJugador == 'M') {
-            return new Maquina(new Normal(ficha));
+            return new Maquina(new Normal(ficha),tipoJugador);
         } else {
-            return new Humano(new Normal(ficha));
+            return new Humano(new Normal(ficha),tipoJugador);
         }
     }
 
@@ -68,11 +69,12 @@ public class Gomoku {
      * @param y Coordenada Y seleccionada por el jugador
      */
     public void playGame(int x, int y) {
-        Jugador jugadorActual = turnoJugador ? j2: j1 ;
+        Jugador jugadorActual = turnoJugador ? j1:j2  ;
         Casillas casillaActual = tablero.getCasilla(x, y);
         char fichaActual = casillaActual.getFicha();
         Ficha fichaJugador = jugadorActual.getFicha();
         char fichajugadoractual = fichaJugador.getJugador();
+        // Verificar si la ficha a colocar es de tipo especial y realizar acciones específicas
         // Verificar si la casilla es especial
         if (casillaActual instanceof Mine) {
             ((Mine) casillaActual).explotar(jugadorActual, tablero.getCasillas());
@@ -80,6 +82,10 @@ public class Gomoku {
             ((Teleport) casillaActual).teletransportar(jugadorActual, fichajugadoractual, tablero);
         } else if (casillaActual instanceof Golden) {
             ((Golden) casillaActual).darPiedraAleatoria(jugadorActual);
+        }if (fichaJugador instanceof Pesada) {
+            ((Pesada) fichaJugador).colocarEnTablero(tablero, x, y, fichajugadoractual);
+        } else if (fichaJugador instanceof Temporal) {
+            ((Temporal) fichaJugador).colocarEnTablero(tablero, x, y, fichajugadoractual);
         } else {
             // Si no es una casilla especial, colocar la ficha normalmente
             if (fichaActual != ' ') {
@@ -98,6 +104,14 @@ public class Gomoku {
         turnoJugador = !turnoJugador;
     }
 
+    public void JugarMaquina(int x, int y){
+        if (j1 instanceof Maquina) {
+            ((Maquina) j1).Play(tablero, this,x,y);
+        }
+        if (!JuegoFinalizado && j2 instanceof Maquina) {
+            ((Maquina) j2).Play(tablero, this,x,y);
+        }
+    }
     /**
      * Verifica si hay cinco o más fichas del mismo tipo en línea desde la posición (x, y) con una ficha específica.
      * Comprueba horizontalmente, verticalmente y en diagonales.
@@ -160,6 +174,11 @@ public class Gomoku {
         return fichaJugador.getJugador();
     }
 
+    public char PlayerTipo(){
+        Jugador jugadorActual = turnoJugador ? j1 : j2;
+        return jugadorActual.getTipo();
+    }
+
     public boolean getJuegoFinalizado() {
         return JuegoFinalizado;
     }
@@ -196,7 +215,7 @@ public class Gomoku {
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------//
     public static void main(String[] args) {
-        Gomoku game = new Gomoku('M', 'T',false,true);
+        Gomoku game = new Gomoku('M', 'T',false,false,15);
         game.start();
     }
     // Métodos para obtener las coordenadas del jugador desde la consola (Ejemplo básico)

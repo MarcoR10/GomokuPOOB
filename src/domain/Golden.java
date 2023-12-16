@@ -1,7 +1,8 @@
 package domain;
+import java.io.Serializable;
 import java.util.Random;
 
-public class Golden extends Casillas{
+public class Golden extends Casillas implements Serializable {
     public Golden(int x, int y) {
         super(x, y);
         type = 'G';
