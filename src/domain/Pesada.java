@@ -3,12 +3,13 @@ package domain;
 import java.awt.*;
 
 public class Pesada extends Fichas{
-    private final char Tipo = 'P';
+    private char Tipo = 'P';
     private Color color;
     private char jugador;
 
-    public Pesada(){
-
+    public Pesada(char Jugador){
+        super(Jugador);
+        Tipo = 'P';
     }
 
     public void colocarEnTablero(Tablero tablero, int x, int y, char jugador) {

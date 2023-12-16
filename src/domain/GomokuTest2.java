@@ -3,31 +3,25 @@ package domain;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
-import java.io.IOException;
 
 public class GomokuTest2 {
 
     @Test
     public  void pruebaCasillas() {
         System.out.println("Pruebas para la clase Casillas:");
-
         // Crear una instancia de Casillas
         Casillas casilla = new Casillas(1, 2);
-
         // Obtener y verificar las coordenadas
         int x = casilla.getX();
         int y = casilla.getY();
         System.out.println("Coordenadas: (" + x + ", " + y + ")"); // Debería imprimir (1, 2)
-
         // Establecer y verificar la ficha
         casilla.setFicha('X');
         char ficha = casilla.getFicha();
         System.out.println("Ficha: " + ficha); // Debería imprimir 'X'
-
         // Verificar el tipo
         char type = casilla.getType();
         System.out.println("Tipo: " + type); // Debería imprimir 'N'
-
         System.out.println("Pruebas para Casillas completadas.\n");
     }
 
@@ -85,15 +79,15 @@ public class GomokuTest2 {
     @Test
     public  void testVerificacionGanadorHorizontal() {
         Gomoku gomoku = new Gomoku('H', 'H', false, false);
-        gomoku.playgame(0, 0);
-        gomoku.playgame(1, 0);
-        gomoku.playgame(0, 1);
-        gomoku.playgame(2, 2);
-        gomoku.playgame(0, 2);
-        gomoku.playgame(12, 11);
-        gomoku.playgame(0, 3);
-        gomoku.playgame(12, 12);
-        gomoku.playgame(0, 4);
+        gomoku.playGame(0, 0);
+        gomoku.playGame(1, 0);
+        gomoku.playGame(0, 1);
+        gomoku.playGame(2, 2);
+        gomoku.playGame(0, 2);
+        gomoku.playGame(12, 11);
+        gomoku.playGame(0, 3);
+        gomoku.playGame(12, 12);
+        gomoku.playGame(0, 4);
         if (gomoku.Verificacion(0, 4, 'O')) { // Cambiado a 'X' en lugar de 'O'
             System.out.println("Prueba de verificación ganador horizontal pasó.");
         } else {
@@ -104,15 +98,15 @@ public class GomokuTest2 {
     @Test
     public  void testVerificacionGanadorVertical() {
         Gomoku gomoku = new Gomoku('H', 'H', false, false);
-        gomoku.playgame(0, 0);
-        gomoku.playgame(0, 1);
-        gomoku.playgame(1, 0);
-        gomoku.playgame(1, 1);
-        gomoku.playgame(2, 0);
-        gomoku.playgame(2, 1);
-        gomoku.playgame(3, 0);
-        gomoku.playgame(3, 1);
-        gomoku.playgame(4, 0);
+        gomoku.playGame(0, 0);
+        gomoku.playGame(0, 1);
+        gomoku.playGame(1, 0);
+        gomoku.playGame(1, 1);
+        gomoku.playGame(2, 0);
+        gomoku.playGame(2, 1);
+        gomoku.playGame(3, 0);
+        gomoku.playGame(3, 1);
+        gomoku.playGame(4, 0);
         if (gomoku.Verificacion(4, 0, 'O')) { // Cambiado a 'O' en lugar de '0'
             System.out.println("Prueba de verificación ganador vertical pasó.");
         } else {
@@ -123,15 +117,15 @@ public class GomokuTest2 {
     @Test
     public  void testVerificacionGanadorDiagonal() {
         Gomoku gomoku = new Gomoku('H', 'H', false, false);
-        gomoku.playgame(0, 0);
-        gomoku.playgame(0, 1);
-        gomoku.playgame(1, 1);
-        gomoku.playgame(2, 1);
-        gomoku.playgame(2, 2);
-        gomoku.playgame(5, 1);
-        gomoku.playgame(3, 3);
-        gomoku.playgame(3, 1);
-        gomoku.playgame(4, 4);
+        gomoku.playGame(0, 0);
+        gomoku.playGame(0, 1);
+        gomoku.playGame(1, 1);
+        gomoku.playGame(2, 1);
+        gomoku.playGame(2, 2);
+        gomoku.playGame(5, 1);
+        gomoku.playGame(3, 3);
+        gomoku.playGame(3, 1);
+        gomoku.playGame(4, 4);
         if (gomoku.Verificacion(4, 4, 'O')) { // Cambiado a 'O' en lugar de '0'
             System.out.println("Prueba de verificación ganador diagonal pasó.");
         } else {
@@ -180,7 +174,7 @@ public class GomokuTest2 {
         assertFalse(gomoku.Verificacion(0, 0, 'X')); // No debe haber victoria al principio
         // Simular una línea horizontal de fichas 'X'
         for (int i = 0; i < 5; i++) {
-            gomoku.playgame(i, 0);
+            gomoku.playGame(i, 0);
         }
         assertFalse(gomoku.Verificacion(0, 0, 'X')); // Verificar victoria horizontal
     }
@@ -191,7 +185,7 @@ public class GomokuTest2 {
         assertFalse(gomoku.Verificacion(0, 0, 'O')); // No debe haber victoria al principio
         // Simular una línea vertical de fichas 'O'
         for (int i = 0; i < 5; i++) {
-            gomoku.playgame(0, i);
+            gomoku.playGame(0, i);
         }
         assertFalse(gomoku.Verificacion(0, 0, 'O')); // Verificar victoria vertical
     }
@@ -201,7 +195,7 @@ public class GomokuTest2 {
         assertFalse(gomoku.Verificacion(0, 0, 'X')); // No debe haber victoria al principio
         // Simular una línea diagonal de fichas 'X'
         for (int i = 0; i < 5; i++) {
-            gomoku.playgame(i, i);
+            gomoku.playGame(i, i);
         }
         assertFalse(gomoku.Verificacion(0, 0, 'X')); // Verificar victoria diagonal
     }

@@ -3,12 +3,13 @@ package domain;
 import java.awt.*;
 
 public class Temporal extends Fichas{
-    private final char Tipo = 'E';
+    private char Tipo ;
     private Color color;
     private char jugador;
     private int turnosRestantes;
-    public Temporal(){
-
+    public Temporal(char Jugador){
+        super(Jugador);
+        Tipo = 'T';
     }
     public void colocarEnTablero(Tablero tablero, int x, int y, char jugador) {
         tablero.colocarFicha(x, y, jugador);

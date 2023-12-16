@@ -1,7 +1,7 @@
 package domain;
 
 public interface Jugador {
-    char getFicha();
+    Ficha getFicha();
     void Play();
 
 }

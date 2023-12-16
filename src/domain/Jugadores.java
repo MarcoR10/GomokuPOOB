@@ -4,13 +4,17 @@ import java.awt.*;
 public class Jugadores implements Jugador{
     protected String Nombre;
     protected Color color;
-    protected char Ficha;
+    protected Fichas Ficha;
     protected int Puntaje;
-    public Jugadores(char Ficha){
+    public Jugadores(Fichas Ficha){
         this.Ficha = Ficha;
     }
-    public char getFicha(){
+    public Ficha getFicha(){
         return Ficha;
+    }
+
+    public char getJugador(){
+        return Ficha.getJugador();
     }
     public void Play(){
     }

@@ -7,11 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.Timer;
 import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -19,23 +16,22 @@ public class MenuGUI extends JFrame{
     private static MenuGUI GomukuPOOB;
     private Gomoku Game;
     private int Posx,Posy;
-    boolean casillaValor,fichaValor;
-    private String NombreJ1 ,NombreJ2,ColorJ1,ColorJ2;
+    private boolean casillaValor,fichaValor;
+    private String NombreJ1 ,NombreJ2;
     private char Tjugador1,Tjugador2;
     private JPanel Inicio,Configuracion,Juego,Player1,Player2;
-    private JLabel Front;
     private JButton BJugar,colorJugador1,colorJugador2,confirm;
-    private JButton[][] buttons;
-    private Dimension Pantalla;
+    private JTextField nombreJugador1,nombreJugador2;
+    private JLabel Nombre1,Nombre2, Color1,Color2,CasillasE, PiedrasE,TipoJugador1,TipoJugador2,Modo,TamañoT,Front;
+    private JComboBox<String> comboBox1,comboBox2,comboBox3,comboBox4,comboBox5,comboBox6;
     private JMenu archivo, settings;
     private JMenuBar menuBar;
     private JMenuItem load, save, start, quit, tamaño, colorselect,restart;
-    private String[] opciones,opciones2,opciones3,opciones4,opciones5;
+    private CirculoEnBoton[][] buttons;
+    private Dimension Pantalla;
+    private String[] opciones,opciones2,opciones3,opciones4,opciones5,opciones6;
     private ImageIcon Fondo;
-    private Color color;
-    private JTextField nombreJugador1,nombreJugador2;
-    private JLabel Nombre1,Nombre2, Color1,Color2,CasillasE, PiedrasE,TipoJugador1,TipoJugador2,Modo;
-    private JComboBox<String> comboBox1,comboBox2,comboBox3,comboBox4,comboBox5;
+    private Color color,ColorP1,ColorP2;
 
     //-------------------------------------------------------------------------//
     public MenuGUI() {
@@ -69,12 +65,10 @@ public class MenuGUI extends JFrame{
         Inicio.add(Front);
         add(Inicio);
     }
-
     private void PanelConfiguracion() {
         //--------------------------------------------//
         Configuracion = new JPanel();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        //setSize(Pantalla.width, Pantalla.height);
         setLocationRelativeTo(null);
         Configuracion.setLayout(null);
         //--------------------------------------------//
@@ -119,9 +113,7 @@ public class MenuGUI extends JFrame{
         TipoJugador1.setForeground(Color.BLACK);
         TipoJugador1.setBounds(20,150,250,100);
         Configuracion.add(TipoJugador1);
-        // Crear un array de elementos para el JComboBox
         opciones = new String[]{"Humano", "Maquina"};
-        // Crear un JComboBox y agregarle los elementos
         comboBox1 = new JComboBox<>(opciones);
         comboBox1.setBounds(290, 185, 150, 30);
         Configuracion.add(comboBox1);
@@ -131,9 +123,7 @@ public class MenuGUI extends JFrame{
         TipoJugador2.setForeground(Color.BLACK);
         TipoJugador2.setBounds(700,150,250,100);
         Configuracion.add(TipoJugador2);
-        // Crear un array de elementos para el JComboBox
         opciones2 =new String[] {"Humano", "Maquina"};
-        // Crear un JComboBox y agregarle los elementos
         comboBox2 = new JComboBox<>(opciones2);
         comboBox2.setBounds(950, 185, 150, 30);
         Configuracion.add(comboBox2);
@@ -143,9 +133,7 @@ public class MenuGUI extends JFrame{
         Modo.setForeground(Color.BLACK);
         Modo.setBounds(500,265,250,100);
         Configuracion.add(Modo);
-        // Crear un array de elementos para el JComboBox
         opciones3 =new String[] {"Normal", "QuikTime","PiedraLimitada"};
-        // Crear un JComboBox y agregarle los elementos
         comboBox3 = new JComboBox<>(opciones3);
         comboBox3.setBounds(650, 300, 150, 30);
         Configuracion.add(comboBox3);
@@ -155,9 +143,7 @@ public class MenuGUI extends JFrame{
         CasillasE.setForeground(Color.BLACK);
         CasillasE.setBounds(500,315,250,100);
         Configuracion.add(CasillasE);
-        // Crear un array de elementos para el JComboBox
-        opciones4 =new String[] {"True", "False"};
-        // Crear un JComboBox y agregarle los elementos
+        opciones4 =new String[] {"False","True"};
         comboBox4 = new JComboBox<>(opciones4);
         comboBox4.setBounds(650, 350, 150, 30);
         Configuracion.add(comboBox4);
@@ -167,14 +153,20 @@ public class MenuGUI extends JFrame{
         PiedrasE.setForeground(Color.BLACK);
         PiedrasE.setBounds(500,365,250,100);
         Configuracion.add(PiedrasE);
-        // Crear un array de elementos para el JComboBox
-        opciones5 =new String[] {"True", "False"};
-        // Crear un JComboBox y agregarle los elementos
+        opciones5 =new String[] {"False","True"};
         comboBox5 = new JComboBox<>(opciones5);
         comboBox5.setBounds(650, 400, 150, 30);
         Configuracion.add(comboBox5);
         //-------------------------------------------------------------------------//
-        //-------------------------------------------------------------------------//
+        TamañoT = new JLabel("Tamaño del Tablero:");
+        TamañoT.setFont(new Font("Bodoni MT Cursiva", Font.BOLD, 15));
+        TamañoT.setForeground(Color.BLACK);
+        TamañoT.setBounds(500,415,250,100);
+        Configuracion.add(TamañoT);
+        opciones6 =new String[] {"Minimo", "Estandar","Grande"};
+        comboBox6 = new JComboBox<>(opciones6);
+        comboBox6.setBounds(650, 450, 150, 30);
+        Configuracion.add(comboBox6);
         //-------------------------------------------------------------------------//
         confirm = new JButton("Confirmar");
         confirm.setFont(new Font("Bodoni MT Cursiva", Font.BOLD, 20));
@@ -182,10 +174,8 @@ public class MenuGUI extends JFrame{
         confirm.setBounds(600,650,150,50);
         Configuracion.add(confirm);
         //-------------------------------------------------------------------------//
-        //--------------------------------------------//
         add(Configuracion);
     }
-
     private void PanelJuego() {
         Object j1 = comboBox1.getSelectedItem();
         String Typo1 = (String) j1;
@@ -199,8 +189,6 @@ public class MenuGUI extends JFrame{
         fichaValor = Boolean.parseBoolean((String) ficha);
         //--------------------------------------------//
         Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor);
-        //System.out.println(letra1.charAt(1)+ letra2.charAt(1) + ficha.toString()+casilla.toString());
-        //Game.start();
         //--------------------------------------------//
         Juego = new JPanel(new GridBagLayout());
         Juego.setLayout(new GridLayout(15, 15));
@@ -210,10 +198,10 @@ public class MenuGUI extends JFrame{
         //--------------------------------------------//
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        buttons = new JButton[15][15];
+        buttons = new CirculoEnBoton[15][15];
         for (int row = 0; row < 15; row++) {
             for (int col = 0; col < 15; col++) {
-                buttons[row][col] = new JButton();
+                buttons[row][col] = new CirculoEnBoton(); ;
                 buttons[row][col].setBackground(color);
                 gbc.gridx = col;
                 gbc.gridy = row;
@@ -226,40 +214,70 @@ public class MenuGUI extends JFrame{
         }
         //-------------------------------------------------------------------------//
         Player1 = new JPanel();
-        Player1.setLayout(new FlowLayout());
-        //JugadorInfo jugador1Info = obtenerInformacionJugador(Tjugador1);
-        //JugadorInfo jugador2Info = obtenerInformacionJugador(Tjugador2);
-        // Crear etiquetas para mostrar la información del jugador 1
-        JLabel nombreJugador1 = new JLabel("Nombre: " + NombreJ1);
-        JLabel colorJugador1 = new JLabel("Color: " + ColorJ1);
-        //JLabel fichaJugador1 = new JLabel("Ficha: " + jugador1Info.getFicha());
-        //JLabel puntajeJugador1 = new JLabel("Puntaje: " + jugador1Info.getPuntaje());
-        // Establecer ubicaciones y tamaños de las etiquetas del jugador 1
-        nombreJugador1.setBounds(10, 20, 150, 30);
-        colorJugador1.setBounds(10, 60, 150, 30);
-        //fichaJugador1.setBounds(10, 100, 150, 30);
-        //puntajeJugador1.setBounds(10, 140, 150, 30);
-        // Agregar etiquetas del jugador 1 al panel Player1
-        Player1.add(nombreJugador1);
-        Player1.add(colorJugador1);
-        // Player1.add(fichaJugador1);
-        // Player1.add(puntajeJugador1);
+        Player1.setLayout(new BoxLayout(Player1, BoxLayout.Y_AXIS));
+        Player1.setBorder(BorderFactory.createTitledBorder("Jugador 1"));
+        //-------------------------------------------------------------------------//
+        JLabel nombreJugador1Label = new JLabel("Nombre:");
+        JLabel colorJugador1Label = new JLabel("Color:");
+        JLabel piedrasJugador1Label = new JLabel("Piedras disponibles:");
+        JLabel tiempoJugador1Label = new JLabel("Tiempo invertido:");
+        JLabel puntajeJugador1Label = new JLabel("Puntaje:");
+        //-------------------------------------------------------------------------//
+        JLabel nombreJugador1Value = new JLabel(NombreJ1);
+        nombreJugador1Value.setForeground(Color.BLACK);
+        JPanel colorPanelJugador1 = new JPanel();
+        colorPanelJugador1.setBackground(ColorP1);
+        JLabel piedrasJugador1Value = new JLabel("Piedra 1: 5, Piedra 2: 3, Piedra 3: 8");
+        JLabel tiempoJugador1Value = new JLabel("2 horas 15 minutos");
+        JLabel puntajeJugador1Value = new JLabel("1500 puntos");
+        //-------------------------------------------------------------------------//
+        Player1.add(nombreJugador1Label);
+        Player1.add(nombreJugador1Value);
+        Player1.add(Box.createVerticalStrut(10));
+        Player1.add(colorJugador1Label);
+        Player1.add(colorPanelJugador1);
+        Player1.add(Box.createVerticalStrut(5));
+        Player1.add(piedrasJugador1Label);
+        Player1.add(piedrasJugador1Value);
+        Player1.add(Box.createVerticalStrut(10));
+        Player1.add(tiempoJugador1Label);
+        Player1.add(tiempoJugador1Value);
+        Player1.add(Box.createVerticalStrut(10));
+        Player1.add(puntajeJugador1Label);
+        Player1.add(puntajeJugador1Value);
         //-------------------------------------------------------------------------//
         Player2 = new JPanel();
-        Player2.setLayout(new FlowLayout());
-        // Crear etiquetas para mostrar la información del jugador 2 (siguiendo un proceso similar al del jugador 1)
-        JLabel nombreJugador2 = new JLabel("Nombre: " + NombreJ2);
-        JLabel colorJugador2 = new JLabel("Color: " + ColorJ2 );
-        // JLabel fichaJugador2 = new JLabel("Ficha: " + jugador2Info.getFicha());
-        //JLabel puntajeJugador2 = new JLabel("Puntaje: " + jugador2Info.getPuntaje());
-        nombreJugador2.setBounds(10, 20, 150, 30);
-        colorJugador2.setBounds(10, 60, 150, 30);
-        //fichaJugador2.setBounds(10, 100, 150, 30);
-        //puntajeJugador2.setBounds(10, 140, 150, 30);
-        Player2.add(nombreJugador2);
-        Player2.add(colorJugador2);
-        //Player2.add(fichaJugador2);
-        //Player2.add(puntajeJugador2);
+        Player2.setLayout(new BoxLayout(Player2, BoxLayout.Y_AXIS));
+        Player2.setBorder(BorderFactory.createTitledBorder("Jugador 2"));
+        //-------------------------------------------------------------------------//
+        JLabel nombreJugador2Label = new JLabel("Nombre: ");
+        JLabel colorJugador2Label = new JLabel("Color: ");
+        JLabel piedrasJugador2Label = new JLabel("Piedras disponibles:");
+        JLabel tiempoJugador2Label = new JLabel("Tiempo invertido:");
+        JLabel puntajeJugador2Label = new JLabel("Puntaje:");
+        //-------------------------------------------------------------------------//
+        JLabel nombreJugador2Value = new JLabel(NombreJ2);
+        nombreJugador2Value.setForeground(Color.BLACK);
+        JPanel colorPanelJugador2 = new JPanel();
+        colorPanelJugador2.setBackground(ColorP2);
+        JLabel piedrasJugador2Value = new JLabel("Piedra 1: 5, Piedra 2: 3, Piedra 3: 8");
+        JLabel tiempoJugador2Value = new JLabel("2 horas 15 minutos");
+        JLabel puntajeJugador2Value = new JLabel("1500 puntos");
+        //-------------------------------------------------------------------------//
+        Player2.add(nombreJugador2Label);
+        Player2.add(nombreJugador2Value);
+        Player2.add(Box.createVerticalStrut(10));
+        Player2.add(colorJugador2Label);
+        Player2.add(colorPanelJugador2);
+        Player2.add(Box.createVerticalStrut(5));
+        Player2.add(piedrasJugador2Label);
+        Player2.add(piedrasJugador2Value);
+        Player2.add(Box.createVerticalStrut(10));
+        Player2.add(tiempoJugador2Label);
+        Player2.add(tiempoJugador2Value);
+        Player2.add(Box.createVerticalStrut(10));
+        Player2.add(puntajeJugador2Label);
+        Player2.add(puntajeJugador2Value);
         //-------------------------------------------------------------------------//
         //-------------------------------------------------------------------------//
         //--------------------------------------------//
@@ -269,7 +287,6 @@ public class MenuGUI extends JFrame{
         add(Juego);
     }
     //-------------------------------------------------------------------------//
-
     public void prepareElementsMenu() {
         setBackground(Color.WHITE);
         menuBar = new JMenuBar();
@@ -301,7 +318,6 @@ public class MenuGUI extends JFrame{
         //-------------------------------------------------------------------------//
         setJMenuBar(menuBar);
     }
-
     public void prepareElementsPlayer(){
         Inicio.setVisible(false);
         PanelConfiguracion();
@@ -310,7 +326,6 @@ public class MenuGUI extends JFrame{
         validate();
         repaint();
     }
-
     public void prepareElementsBoard(){
         Configuracion.setVisible(false);
         PanelJuego() ;
@@ -320,21 +335,12 @@ public class MenuGUI extends JFrame{
         validate();
         repaint();
     }
-
-    private void salida() {
-        if (JOptionPane.showConfirmDialog(rootPane, "Seguro que quiere salir", "Salir del sistema", JOptionPane.YES_NO_OPTION
-        ) == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }else {
-            setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        }
-    }
-    //-------------------------------------------------------------------------//
+    //-------------------------------------------------------------------------////-------------------------------------------------------------------------////-------------------------------------------------------------------------//
     public void prepareActions() {
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent ev) {
-                salida();
+                Salida();
             }
         });
         BJugar.addActionListener(e -> {
@@ -347,9 +353,9 @@ public class MenuGUI extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 Color colorSeleccionado = JColorChooser.showDialog(null, "Selecciona un color", Color.WHITE);
+                ColorP1 = colorSeleccionado;
                 if (colorSeleccionado != null) {
                     colorJugador1.setBackground(colorSeleccionado);
-                    // Puedes obtener el código RGB del color seleccionado y asignarlo al JTextField
                     String rgb = String.format("#%02x%02x%02x", colorSeleccionado.getRed(), colorSeleccionado.getGreen(), colorSeleccionado.getBlue());
                     colorJugador1.setText(rgb);
                 }
@@ -359,24 +365,22 @@ public class MenuGUI extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 Color colorSeleccionado = JColorChooser.showDialog(null, "Selecciona un color", Color.WHITE);
+                ColorP2 = colorSeleccionado;
                 if (colorSeleccionado != null) {
-                    colorJugador2.setBackground(colorSeleccionado); // Corregir el nombre del JTextField aquí
-                    // Puedes obtener el código RGB del color seleccionado y asignarlo al JTextField
+                    colorJugador2.setBackground(colorSeleccionado);
                     String rgb = String.format("#%02x%02x%02x", colorSeleccionado.getRed(), colorSeleccionado.getGreen(), colorSeleccionado.getBlue());
-                    colorJugador2.setText(rgb); // Corregir el nombre del JTextField aquí
+                    colorJugador2.setText(rgb);
                 }
             }
         });
         comboBox1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Obtener el elemento seleccionado del JComboBox
                 String selectedOption = comboBox1.getSelectedItem().toString();
                 System.out.println("Seleccionado: " + selectedOption);
             }
         });
         comboBox2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Obtener el elemento seleccionado del JComboBox
                 String selectedOption = comboBox2.getSelectedItem().toString();
                 System.out.println("Seleccionado: " + selectedOption);
             }
@@ -440,24 +444,39 @@ public class MenuGUI extends JFrame{
         }
     }
 
+    //-------------------------------------------------------------------------////-------------------------------------------------------------------------////-------------------------------------------------------------------------//
     public void Jugada(int fila,int columna){
-        Game.playgame(fila, columna);
+        Game.playGame(fila, columna);
         char currentPlayer = Game.FichaPlayer();
-        Color colorFicha = (currentPlayer == 'X') ? Color.RED : Color.BLUE;
-        buttons[fila][columna].setBackground(colorFicha);
+        Color colorFicha = (currentPlayer == 'X') ? ColorP1 : ColorP2;
+        buttons[fila][columna].setColorCirculo(colorFicha);
+        //buttons[fila][columna].setBackground(colorFicha);
         buttons[fila][columna].setEnabled(false);
         boolean JuegoFinaliado = Game.getJuegoFinalizado();
+        String nombreFicha = (currentPlayer == 'X') ? NombreJ1 : NombreJ2;
         if (JuegoFinaliado) {
-            JOptionPane.showMessageDialog(null, "¡El jugador " + currentPlayer + " ha ganado!");
+            JOptionPane.showMessageDialog(null, "¡El jugador " + nombreFicha + " ha ganado!");
         }
     }
 
     private void Nuevo() {
-        int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea iniciar una nueva simulación?", "Nueva simulación", JOptionPane.YES_NO_OPTION);
+        int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea iniciar un nuevo juego?", "Nuevo Juego", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
-            Game = new Gomoku(Tjugador1,Tjugador2,fichaValor,casillaValor);
-            repaint();
+            reiniciarJuego();
         }
+    }
+    private void reiniciarJuego() {
+        Game = new Gomoku(Tjugador1, Tjugador2, fichaValor, casillaValor);
+        limpiarTablero();
+    }
+    private void limpiarTablero() {
+        for (int row = 0; row < 15; row++) {
+            for (int col = 0; col < 15; col++) {
+                buttons[row][col].setBackground(color);
+                buttons[row][col].setEnabled(true);
+            }
+        }
+        repaint();
     }
     /**
      * Método para abrir una simulación guardada desde un archivo.
@@ -514,7 +533,7 @@ public class MenuGUI extends JFrame{
             setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         }
     }
-    //-------------------------------------------------------------------------//
+    //-------------------------------------------------------------------------////-------------------------------------------------------------------------////-------------------------------------------------------------------------//
     public void paint(Graphics g) {
         ImageIcon imageIcon = new ImageIcon("/Imagenes/Fondo.jpg");
         Image image = imageIcon.getImage();
@@ -527,4 +546,26 @@ public class MenuGUI extends JFrame{
         GomukuPOOB.setVisible(true);
     }
     //-------------------------------------------------------------------------//
+}
+
+class CirculoEnBoton extends JButton {
+    private Color colorCirculo;
+
+    public CirculoEnBoton() {
+        super();
+        this.colorCirculo = null; // Color predeterminado para el círculo
+    }
+
+    public void setColorCirculo(Color color) {
+        this.colorCirculo = color;
+        repaint(); // Vuelve a pintar el botón cuando se cambia el color del círculo
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        int diametro = Math.min(getWidth(), getHeight()) - 6; // Diámetro del círculo
+        g.setColor(colorCirculo);
+        g.fillOval((getWidth() - diametro) / 2, (getHeight() - diametro) / 2, diametro, diametro);
+    }
 }

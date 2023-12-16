@@ -1,10 +1,10 @@
 package domain;
 
 public class Maquina extends Jugadores{
-    public Maquina(char ficha){
+    public Maquina(Fichas ficha){
         super(ficha);
     }
-    public char getFicha(){
+    public Fichas getFicha(){
         return Ficha;
     }
 
@@ -24,13 +24,13 @@ public class Maquina extends Jugadores{
             ((Mine) casillaElegida).explotar(this,tablero.getCasillas());
         } else if (casillaElegida instanceof Teleport) {
             // Realizar la acción de teletransportar
-            ((Teleport) casillaElegida).teletransportar(this,this.getFicha(), tablero);
+            ((Teleport) casillaElegida).teletransportar(this,Ficha.getJugador(),tablero);
         } else if (casillaElegida instanceof Golden) {
             // Realizar la acción de obtener una piedra aleatoria
             ((Golden) casillaElegida).darPiedraAleatoria(this);
         } else {
             // Realizar el movimiento normal si no es una casilla especial
-            gomoku.playgame(x, y);
+            gomoku.playGame(x, y);
         }
     }
     // Generar un movimiento aleatorio dentro de los límites del tablero

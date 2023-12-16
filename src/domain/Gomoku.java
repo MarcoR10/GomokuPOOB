@@ -19,17 +19,17 @@ public class Gomoku {
      * @param FichaE Indica si se usan fichas especiales
      * @param CasillaE Indica si se usan casillas especiales
      */
-    public Gomoku(char Tjugardor1, char Tjugardor2,boolean FichaE,boolean CasillaE) {
-        tablero = new Tablero(15, 15,FichaE,CasillaE);
-        if (Tjugardor1 == 'M') {
-            j1 = new Maquina('X');
+    public Gomoku(char Tjugardor1, char Tjugardor2, boolean FichaE, boolean CasillaE) {
+        tablero = new Tablero(15, 15, FichaE, CasillaE);
+        j1 = crearJugador(Tjugardor1, 'X');
+        j2 = crearJugador(Tjugardor2, 'O');
+    }
+
+    private Jugador crearJugador(char tipoJugador, char ficha) {
+        if (tipoJugador == 'M') {
+            return new Maquina(new Normal(ficha));
         } else {
-            j1 = new Humano('X');
-        }
-        if (Tjugardor2 == 'M') {
-            j2 = new Maquina('O');
-        } else {
-            j2 = new Humano('O');
+            return new Humano(new Normal(ficha));
         }
     }
 
@@ -42,13 +42,12 @@ public class Gomoku {
         JuegoFinalizado = false;
         while (!JuegoFinalizado) {
             if (turnoJugador) {
-                // Turno del jugador 1 (Humano o Máquina)
                 if (j1 instanceof Maquina) {
                     ((Maquina) j1).Play(tablero, this);
                 } else {
                     int x = obtenerCoordenadaX();
                     int y = obtenerCoordenadaY();
-                    playgame(x, y);
+                    playGame(x, y);
                 }
             } else {
                 // Turno del jugador 2 (Humano o Máquina)
@@ -57,7 +56,7 @@ public class Gomoku {
                 } else {
                     int x = obtenerCoordenadaX();
                     int y = obtenerCoordenadaY();
-                    playgame(x, y);
+                    playGame(x, y);
                 }
             }
         }
@@ -68,30 +67,30 @@ public class Gomoku {
      * @param x Coordenada X seleccionada por el jugador
      * @param y Coordenada Y seleccionada por el jugador
      */
-    public void playgame(int x, int y) {
-        Jugador jugadorActual = turnoJugador ? j1 : j2;
+    public void playGame(int x, int y) {
+        Jugador jugadorActual = turnoJugador ? j2: j1 ;
         Casillas casillaActual = tablero.getCasilla(x, y);
         char fichaActual = casillaActual.getFicha();
+        Ficha fichaJugador = jugadorActual.getFicha();
+        char fichajugadoractual = fichaJugador.getJugador();
         // Verificar si la casilla es especial
         if (casillaActual instanceof Mine) {
             ((Mine) casillaActual).explotar(jugadorActual, tablero.getCasillas());
-            // Otras acciones si la casilla es una Mine
         } else if (casillaActual instanceof Teleport) {
-            ((Teleport) casillaActual).teletransportar(jugadorActual, jugadorActual.getFicha(), tablero);
-            // Otras acciones si la casilla es un Teleport
+            ((Teleport) casillaActual).teletransportar(jugadorActual, fichajugadoractual, tablero);
         } else if (casillaActual instanceof Golden) {
             ((Golden) casillaActual).darPiedraAleatoria(jugadorActual);
-            // Otras acciones si la casilla es una Golden
         } else {
             // Si no es una casilla especial, colocar la ficha normalmente
             if (fichaActual != ' ') {
                 System.out.println("La casilla ya está ocupada. Elija otra posición.");
                 return;
             }
-            tablero.colocarFicha(x, y, jugadorActual.getFicha());
+            tablero.colocarFicha(x, y, fichajugadoractual);
             tablero.imprimirTablero();
-            if (Verificacion(x, y, jugadorActual.getFicha())) {
+            if (Verificacion(x, y, fichajugadoractual)) {
                 JuegoFinalizado = true;
+                turnoJugador = !turnoJugador;
                 System.out.println("¡" + (turnoJugador ? "Jugador 1" : "Jugador 2") + " ha ganado!");
                 return;
             }
@@ -157,8 +156,8 @@ public class Gomoku {
 
     public char FichaPlayer(){
         Jugador jugadorActual = turnoJugador ? j1 : j2;
-        char Ficha = jugadorActual.getFicha();
-        return Ficha;
+        Ficha fichaJugador = jugadorActual.getFicha();
+        return fichaJugador.getJugador();
     }
 
     public boolean getJuegoFinalizado() {

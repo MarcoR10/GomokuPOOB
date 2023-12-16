@@ -2,12 +2,12 @@ package domain;
 import java.awt.*;
 
 public class Normal extends Fichas{
-    private final char Tipo = 'N';
+    private char Tipo;
     private Color color;
     private char jugador;
 
-    public Normal(){
-
+    public Normal(char Jugador){
+        super(Jugador);
     }
 
 }

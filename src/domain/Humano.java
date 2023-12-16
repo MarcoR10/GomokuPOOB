@@ -1,7 +1,7 @@
 package domain;
 
 public class Humano extends Jugadores {
-    public Humano(char ficha){
+    public Humano(Fichas ficha){
         super(ficha);
     }
 }
