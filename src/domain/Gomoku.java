@@ -13,12 +13,15 @@ public class Gomoku implements Serializable {
     private int NumCasill,NumP;
     private boolean JuegoFinalizado, turnoJugador;
     private char LimitaGame;
+
     /**
      * Constructor de la clase Gomoku.
      * @param Tjugardor1 Tipo de jugador 1 ('M' para máquina, cualquier otro carácter para humano)
      * @param Tjugardor2 Tipo de jugador 2 ('M' para máquina, cualquier otro carácter para humano)
      * @param FichaE Indica si se usan fichas especiales
      * @param CasillaE Indica si se usan casillas especiales
+     * @param NumCasill Número de casillas en el tablero
+     * @param LimitaGame Tipo de límite del juego ('Q' para Quicktime, 'P' para piedras limitadas, 'N' para ninguno)
      */
     public Gomoku(char Tjugardor1, char Tjugardor2, boolean FichaE, boolean CasillaE,int NumCasill,char LimitaGame) {
         this.NumCasill = NumCasill;
@@ -65,7 +68,6 @@ public class Gomoku implements Serializable {
             }
         }
     }
-
     /**
      * Lógica para jugar una partida.
      * @param x Coordenada X seleccionada por el jugador
@@ -94,7 +96,6 @@ public class Gomoku implements Serializable {
                 break;
         }
     }
-
     public void JugarMaquina(int x, int y){
         if (j1 instanceof Maquina) {
             ((Maquina) j1).Play(tablero, this,x,y);
@@ -158,22 +159,23 @@ public class Gomoku implements Serializable {
         // Si hay 5 o más fichas del mismo tipo en línea, el jugador gana
         return count >= 5;
     }
-
     //-------------------------------------------------------------------------------------------------------------------------------------------------//
     private boolean manejarCasillaEspecial(Casillas casilla, Jugador jugador, Tablero tablero) {
         if (casilla instanceof Mine) {
             ((Mine) casilla).explotar(jugador, tablero.getCasillas());
+            tablero.imprimirTablero();
             return true;
         } else if (casilla instanceof Teleport) {
             ((Teleport) casilla).teletransportar(jugador, jugador.getFicha().getJugador(), tablero);
+            tablero.imprimirTablero();
             return true;
         } else if (casilla instanceof Golden) {
             ((Golden) casilla).darPiedraAleatoria(jugador);
+            tablero.imprimirTablero();
             return true;
         }
         return false;
     }
-
     private boolean manejarFichaEspecial(Ficha ficha, Tablero tablero, int x, int y) {
         char jugadorActual = ficha.getJugador();
         if (ficha instanceof Pesada) {
@@ -185,7 +187,6 @@ public class Gomoku implements Serializable {
         }
         return false;
     }
-
     private void colocarFichaNormal(Tablero tablero, int x, int y, Ficha fichaJugador, Jugador jugadorActual, char fichaActual) {
         if (fichaActual != ' ') {
             System.out.println("La casilla ya está ocupada. Elija otra posición.");
@@ -193,17 +194,18 @@ public class Gomoku implements Serializable {
         }
         tablero.colocarFicha(x, y, fichaJugador.getJugador());
         tablero.imprimirTablero();
+        if (tableroLleno() && !JuegoFinalizado) {
+            System.out.println("¡El juego ha terminado en empate!");
+            JuegoFinalizado = true;
+        }
         if (Verificacion(x, y, fichaJugador.getJugador())) {
             JuegoFinalizado = true;
             turnoJugador = !turnoJugador;
             System.out.println("¡" + (turnoJugador ? "Jugador 1" : "Jugador 2") + " ha ganado!");
-        } else {
+        }else{
             turnoJugador = !turnoJugador;
         }
     }
-
-    //-------------------------------------------------------------------------------------------------------------------------------------------------//
-
     //-------------------------------------------------------------------------------------------------------------------------------------------------//
     private void jugarConPiedrasLimitadas(Tablero tablero, boolean turnoJugador, int x, int y) {
         char jugadorActual = turnoJugador ? 'X' : 'O';
@@ -216,7 +218,6 @@ public class Gomoku implements Serializable {
         }
         colocarFicha(tablero, x, y, jugadorActual);
     }
-
     private int contarPiedrasColocadas(Tablero tablero, char jugador) {
         int piedrasColocadas = 0;
         for (int fila = 0; fila < tablero.getLongitud(); fila++) {
@@ -229,7 +230,6 @@ public class Gomoku implements Serializable {
         }
         return piedrasColocadas;
     }
-
     private void colocarFicha(Tablero tablero, int x, int y, char jugadorActual) {
         if (tablero.getCasilla(x, y).getFicha() == ' ') {
             tablero.colocarFicha(x, y, jugadorActual);
@@ -244,7 +244,6 @@ public class Gomoku implements Serializable {
             System.out.println("La casilla está ocupada. Elija otra posición.");
             return;
         }
-        turnoJugador = !turnoJugador;
     }
 //-------------------------------------------------------------------------------------------------------------------------------------------------//
 
@@ -263,6 +262,25 @@ public class Gomoku implements Serializable {
         return JuegoFinalizado;
     }
 
+    public int getNumCasilla(){
+        return NumCasill;
+    }
+    public boolean tableroLleno() {
+        for (int i = 0; i < tablero.getLongitud(); i++) {
+            for (int j = 0; j < tablero.getAltura(); j++) {
+                if (tablero.getCasilla(i, j).getFicha() == ' ') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public void terminarJuegoEnEmpate() {
+        if (tableroLleno() && !JuegoFinalizado) {
+            System.out.println("¡El juego ha terminado en empate!");
+            JuegoFinalizado = true;
+        }
+    }
     //-------------------------------------------------------------------------------------------------------------------------------------------------//
     /**
      * Método para cargar un archivo del juego.
@@ -277,11 +295,10 @@ public class Gomoku implements Serializable {
         }
         tablero = loadedData;
     }
-
     /**
-     * Método para guardar el estado actual del juego en un archivo.
-     * @param archivo Archivo donde se guardará el estado del juego
-     * @throws GomokuException Excepción personalizada del juego Gomoku
+     * Método para guardar un archivo del juego.
+     * @param archivo Archivo a guardar
+     * @throws GomokuException Excepción personalizada para el juego
      */
     public void guardarArchivo(File archivo)  throws GomokuException{
         try (ObjectOutputStream fuera = new ObjectOutputStream(new FileOutputStream(archivo))) {
@@ -296,10 +313,9 @@ public class Gomoku implements Serializable {
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------//
     public static void main(String[] args) {
-        Gomoku game = new Gomoku('T', 'T',false,false,15,'N');
+        Gomoku game = new Gomoku('T', 'T',false,true,15,'N');
         game.start();
     }
-    // Métodos para obtener las coordenadas del jugador desde la consola (Ejemplo básico)
     private static int obtenerCoordenadaX() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Ingrese la coordenada X: ");

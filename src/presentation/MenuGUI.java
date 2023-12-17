@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.util.Random;
 
 public class MenuGUI extends JFrame{
     private static MenuGUI GomukuPOOB;
@@ -19,7 +20,7 @@ public class MenuGUI extends JFrame{
     private int Posx,Posy,Table;
     private boolean casillaValor,fichaValor;
     private String NombreJ1 ,NombreJ2;
-    private char Tjugador1,Tjugador2,TmodoJ;
+    private char Tjugador1,Tjugador2,TmodoJ,currentPlayer;
     private JPanel Inicio,Configuracion,Juego,Player1,Player2;
     private JButton BJugar,colorJugador1,colorJugador2,confirm;
     private JTextField nombreJugador1,nombreJugador2;
@@ -27,7 +28,7 @@ public class MenuGUI extends JFrame{
     private JComboBox<String> comboBox1,comboBox2,comboBox3,comboBox4,comboBox5,comboBox6;
     private JMenu archivo, settings;
     private JMenuBar menuBar;
-    private JMenuItem load, save, start, quit, tamaño, colorselect,restart;
+    private JMenuItem load, save, start, quit, terminar;
     private CirculoEnBoton[][] buttons;
     private Dimension Pantalla;
     private String[] opciones,opciones2,opciones3,opciones4,opciones5,opciones6;
@@ -313,30 +314,23 @@ public class MenuGUI extends JFrame{
         setBackground(Color.WHITE);
         menuBar = new JMenuBar();
         archivo = new JMenu("Archivo");
-        settings = new JMenu("Configuración");
         menuBar.add(archivo);
-        menuBar.add(settings);
         //-------------------------------------------------------------------------//
         start = new JMenuItem("Nuevo");
+        terminar = new JMenuItem("Terminar");
         save = new JMenuItem("Salvar");
         load = new JMenuItem("Abrir");
         quit = new JMenuItem("Salir");
-        tamaño = new JMenuItem("Tamaño");
-        colorselect = new JMenuItem("Color");
-        restart = new JMenuItem("Reiniciar");
         //-------------------------------------------------------------------------//
         archivo.add(start);
+        archivo.addSeparator();
+        archivo.add(terminar);
         archivo.addSeparator();
         archivo.add(load);
         archivo.addSeparator();
         archivo.add(save);
         archivo.addSeparator();
         archivo.add(quit);
-        settings.add(tamaño);
-        settings.addSeparator();
-        settings.add(colorselect);
-        settings.addSeparator();
-        settings.add(restart);
         //-------------------------------------------------------------------------//
         setJMenuBar(menuBar);
     }
@@ -369,7 +363,6 @@ public class MenuGUI extends JFrame{
             prepareElementsPlayer();
         });
     }
-
     public void prepareActionsConfiguration() {
         colorJugador1.addActionListener(new ActionListener() {
             @Override
@@ -428,34 +421,26 @@ public class MenuGUI extends JFrame{
                 Nuevo();
             }
         });
+        terminar.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                End();
+            }
+        });
         save.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    Salvar();
-                } catch (GomokuException ex) {
-                    throw new RuntimeException(ex);
-                }
+                Salvar();
             }
         });
         load.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    Abrir();
-                } catch (GomokuException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                }
+                Abrir();
             }
         });
         for (int row = 0; row < Table; row++) {
             for (int col = 0; col < Table; col++) {
-                int finalRow = row;
-                int finalCol = col;
                 buttons[row][col].addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -477,28 +462,60 @@ public class MenuGUI extends JFrame{
         }
     }
 
+
+
     //-------------------------------------------------------------------------////-------------------------------------------------------------------------////-------------------------------------------------------------------------//
     public void Jugada(int fila,int columna){
+        boolean TGame = PreparaTipo();
+        if(TGame){
+            Random rand = new Random();
+            int n1 = rand.nextInt(Game.getNumCasilla());
+            int n2 = rand.nextInt(Game.getNumCasilla());
+            realizarJugadaMaquina(n1,n2);
+        }
         Game.playGame(fila, columna);
-        char currentPlayer = Game.FichaPlayer();
+        currentPlayer = Game.FichaPlayer();
         Color colorFicha = (currentPlayer == 'X') ? ColorP1 : ColorP2;
         buttons[fila][columna].setColorCirculo(colorFicha);
         buttons[fila][columna].setEnabled(false);
         boolean JuegoFinaliado = Game.getJuegoFinalizado();
+        boolean JuegoLleno = Game.tableroLleno();
         String nombreFicha = (currentPlayer == 'X') ? NombreJ1 : NombreJ2;
-        if (JuegoFinaliado) {
+        if (JuegoFinaliado && JuegoLleno) {
+            JOptionPane.showMessageDialog(null, "¡El juego ha terminado en empate!");
+        }
+        if (JuegoFinaliado && !JuegoLleno) {
             JOptionPane.showMessageDialog(null, "¡El jugador " + nombreFicha + " ha ganado!");
         }
     }
 
     private void realizarJugadaMaquina(int x, int y) {
         Game.JugarMaquina(x,y);
+        currentPlayer = Game.FichaPlayer();
+        Color colorFicha = (currentPlayer == 'X') ? ColorP1 : ColorP2;
+        buttons[x][y].setColorCirculo(colorFicha);
+        buttons[x][y].setEnabled(false);
     }
 
+    private boolean PreparaTipo() {
+        char currentPlayer =  Game.PlayerTipo();
+        if(currentPlayer == 'M'){
+            return true;
+        }else{
+            return false;
+        }
+    }
     private void Nuevo() {
         int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea iniciar un nuevo juego?", "Nuevo Juego", JOptionPane.YES_NO_OPTION);
         if (confirmacion == JOptionPane.YES_OPTION) {
             reiniciarJuego();
+        }
+    }
+    private void End() {
+        int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea terminar el juego en empate?", "Terminar Juego", JOptionPane.YES_NO_OPTION);
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            Game.terminarJuegoEnEmpate();
+            TerminarTablero();
         }
     }
     private void reiniciarJuego() {
@@ -514,66 +531,63 @@ public class MenuGUI extends JFrame{
         }
         repaint();
     }
-
-    private File obtenerArchivo(String descripcion, String... extensiones) {
-        JFileChooser selector = new JFileChooser();
-        selector.setFileFilter(new FileNameExtensionFilter(descripcion, extensiones));
-        int opcion = selector.showDialog(this, null);
-        if (opcion == JFileChooser.APPROVE_OPTION) {
-            return selector.getSelectedFile();
+    private void TerminarTablero() {
+        for (int row = 0; row < Table; row++) {
+            for (int col = 0; col < Table; col++) {
+                //buttons[row][col].setColorCirculo(null);
+                buttons[row][col].setEnabled(false);
+            }
         }
-        return null;
+        repaint();
     }
-
-    private void Abrir() throws GomokuException, IOException, ClassNotFoundException {
+    private void Abrir() {
         try {
-            File archivoSeleccionado = obtenerArchivo("Archivo Gomoku", "GO-M");
-            if (archivoSeleccionado != null && archivoSeleccionado.exists()) {
-                Game.cargarArchivo(archivoSeleccionado);
-                actualizarInterfazDespuesDeCarga();
-                JOptionPane.showMessageDialog(null, "Archivo seleccionado: " + archivoSeleccionado.getAbsolutePath());
+            JFileChooser Seleccion = new JFileChooser();
+            Seleccion.setFileFilter(new FileNameExtensionFilter("Archivo Gomoku", "GO"));
+            int opcion = Seleccion.showOpenDialog(this);
+
+            if (opcion == JFileChooser.APPROVE_OPTION) {
+                File archivoSeleccionado = Seleccion.getSelectedFile();
+                if (archivoSeleccionado != null && archivoSeleccionado.exists()) {
+                    Game.cargarArchivo(archivoSeleccionado);
+                    repaint();
+                    JOptionPane.showMessageDialog(null, "Archivo seleccionado: " + archivoSeleccionado.getAbsolutePath());
+                } else {
+                    JOptionPane.showMessageDialog(null, "No se ha seleccionado un archivo válido.");
+                }
             } else {
-                JOptionPane.showMessageDialog(null, "No se ha seleccionado un archivo válido.");
+                throw new GomokuException("No se ha seleccionado ningún archivo.");
             }
         } catch (IOException | ClassNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new GomokuException("Error al abrir el archivo: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al abrir el archivo: " + e.getMessage());
+            e.printStackTrace();
+        } catch (GomokuException e) {
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
-    private void actualizarInterfazDespuesDeCarga() {
-        // Aquí puedes realizar operaciones para actualizar visualmente la interfaz
-        // Esto puede incluir cambios en componentes, actualización de datos, repintado, etc.
-        // Por ejemplo, si tienes un panel que muestra información:
-        if (Juego != null) {
-            getContentPane().remove(Juego); // Elimina el panel de juego actual
-            PanelJuego(); // Crea un nuevo panel de juego
-            prepareActionsJuego(); // Prepara las acciones para el nuevo panel de juego
-            getContentPane().add(Juego, BorderLayout.CENTER); // Agrega el nuevo panel de juego al contenedor principal
-        }
-        //panelInformacion.actualizarDatos();
-        this.repaint(); // Para repintar la ventana principal
-        this.revalidate(); // Para volver a validar la disposición de los componentes
-    }
-
-    private void Salvar() throws GomokuException {
+    private void Salvar() {
         try {
-            File archivoSeleccionado = obtenerArchivo("Archivo Gomoku", "GO-M");
-            if (archivoSeleccionado != null) {
-                String filePath = archivoSeleccionado.getAbsolutePath();
-                if (!filePath.toLowerCase().endsWith(".go-m")) {
-                    archivoSeleccionado = new File(filePath + ".GO-M");
+            JFileChooser Seleccion = new JFileChooser();
+            Seleccion.setFileFilter(new FileNameExtensionFilter("Archivo Gomoku", "GO"));
+            int opcion = Seleccion.showSaveDialog(this);
+            if (opcion == JFileChooser.APPROVE_OPTION) {
+                File archivoSeleccionado = Seleccion.getSelectedFile();
+                if (archivoSeleccionado != null) {
+                    String filePath = archivoSeleccionado.getAbsolutePath();
+                    if (!filePath.toLowerCase().endsWith(".go")) {
+                        archivoSeleccionado = new File(filePath + ".GO");
+                    }
+                    Game.guardarArchivo(archivoSeleccionado);
+                } else {
+                    JOptionPane.showMessageDialog(null, "No se ha seleccionado un archivo válido.");
                 }
-                Game.guardarArchivo(archivoSeleccionado);
-            } else {
-                JOptionPane.showMessageDialog(null, "No se ha seleccionado un archivo válido.");
             }
-        } catch (Exception e) {
-            throw new GomokuException("Error al guardar el archivo: " + e.getMessage());
+        } catch (GomokuException e) {
+            JOptionPane.showMessageDialog(null, "Error al guardar el archivo: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
     /**
      * Método para salir de la aplicación.
      */
